@@ -33,7 +33,7 @@ class EnglishLanguage implements LanguageInterface
             return $word;
         }
 
-        return mb_strtolower($transliterated);
+        return trim(mb_strtolower($transliterated));
     }
 
     /**
@@ -61,17 +61,27 @@ class EnglishLanguage implements LanguageInterface
 
     public function isPonctuation(string $normalized): int|false
     {
+        // Quote + letter
+        if (preg_match('`\'\w`miu', $normalized)) {
+            return -12;
+        }
+
+        // Letter + quote
+        if (preg_match('`\w\'`miu', $normalized)) {
+            return 12;
+        }
+
         $ponctuationMinusOne = array_map(preg_quote(...), ['“', '‘', '(']);
         if (preg_match('`^('.implode('|', $ponctuationMinusOne).')$`misu', $normalized)) {
             return -1;
         }
 
-        $ponctuationZero = array_map(preg_quote(...), ['-']);
+        $ponctuationZero = array_map(preg_quote(...), ['-', '–']);
         if (preg_match('`^('.implode('|', $ponctuationZero).')$`misu', $normalized)) {
             return 0;
         }
 
-        $ponctuationOne = array_map(preg_quote(...), [';', ':', ',', '.', ')', '”', '’']);
+        $ponctuationOne = array_map(preg_quote(...), [';', ':', ',', '.', ')', '”', "'", '’']);
         if (preg_match('`^('.implode('|', $ponctuationOne).')$`misu', $normalized)) {
             return 1;
         }

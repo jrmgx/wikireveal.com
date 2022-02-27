@@ -118,6 +118,13 @@ a.wz-share, a.wz-share:hover {
     display: inline-block;
 }
 
+.wz-w-ponctuation--12 {
+    width: 0.5rem;
+    display: inline-block;
+    position: relative;
+    left: -0.5rem;
+}
+
 .wz-w-ponctuation-0 {
     position: relative;
     left: -0.5rem;
@@ -130,6 +137,13 @@ a.wz-share, a.wz-share:hover {
     position: relative;
     left: -0.5rem;
     width: 0;
+    display: inline-block;
+}
+
+.wz-w-ponctuation-12 {
+    position: relative;
+    left: 0;
+    width: 0.5rem;
     display: inline-block;
 }
 
