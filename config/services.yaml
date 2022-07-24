@@ -27,5 +27,6 @@ services:
         arguments:
             $languageProvider: !tagged_locator { tag: 'language', index_by: 'key', default_index_method: 'lang' }
 
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
+    App\Command\BuildCommand:
+        arguments:
+            $languageProvider: !tagged_locator { tag: 'language', index_by: 'key', default_index_method: 'lang' }
