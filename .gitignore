@@ -19,3 +19,4 @@
 ###< friendsofphp/php-cs-fixer ###
 
 /.idea/
+/node_modules/

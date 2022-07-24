@@ -1,0 +1,12 @@
+{
+  "name": "wikinize",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Jerome Gx <jerome@gangneux.net>",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^8.20.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.26.0"
+  }
+}

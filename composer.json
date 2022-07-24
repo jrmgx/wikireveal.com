@@ -64,6 +64,7 @@
         "symfony/polyfill-php81": "*"
     },
     "scripts": {
+        "eslint": "npx eslint public/index.js --fix && echo 'No error found!'",
         "phpcs": "vendor/bin/php-cs-fixer fix",
         "phpstan": "vendor/bin/phpstan analyse --memory-limit 512M",
         "auto-scripts": {
