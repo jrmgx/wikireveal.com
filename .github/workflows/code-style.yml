@@ -1,0 +1,38 @@
+name: wikinize-code-style
+on: pull_request
+
+defaults:
+    run:
+        shell: bash
+
+jobs:
+    code-style:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+
+            - name: Composer install
+              uses: docker://jrmgx/wikinize
+              with:
+                  args: composer install
+
+            - name: PHP Code Style
+              uses: docker://jrmgx/wikinize
+              with:
+                  args: composer phpcs
+
+            - name: PHPStan
+              uses: docker://jrmgx/wikinize
+              with:
+                  args: composer phpstan
+
+            - name: NPM install
+              uses: docker://jrmgx/wikinize
+              with:
+                  args: npm install
+
+            - name: Javascript ESLint
+              uses: docker://jrmgx/wikinize
+              with:
+                  args: composer eslint
