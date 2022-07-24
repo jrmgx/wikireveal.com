@@ -1,0 +1,17 @@
+header:
+    title: "Wikinize : Trouvez l'article wikipedia caché !"
+
+ui:
+    # Some specific text you want to give to your player # TODO implement in UI
+    note: "Attention les mots entrés doivent être au singulier, les versions plurielles sont révélés automatiquement."
+    placeholder:
+        # We specify singular here because in our Normalizer we find the singular of the given word
+        guess: "Mot (au singulier)"
+    action:
+        send: "Essayer"
+
+message:
+    victory: "Bravo vous avez trouvé !"
+
+error:
+    already_sent: "Mot déjà proposé"

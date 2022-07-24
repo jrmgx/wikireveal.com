@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ 'header.title'|trans }}{% endblock %}
+{% block body %}
+    <script>
+        window.commonWords = {{ common_words|json_encode|raw }};
+        window.uiMessages = {{ ui_messages|json_encode|raw }};
+        window.winHashes = {{ win_hashes|json_encode|raw }};
+        window.puzzleId = {{ puzzle_id|json_encode|raw }};
+    </script>
+    <div class="wz-container">
+    <div class="wz-text">
+        <div class="wz-words">
+            {% for token in outputs %}
+            {{ token|raw }}
+            {% endfor %}
+        </div>
+    </div>
+    <div class="wz-ui">
+        <div id="wz-message-send"></div>
+        <form id="wz-form-send">
+            <input id="wz-input-guess" type="text" placeholder="{{ 'ui.placeholder.guess'|trans }}">
+            <button id="wz-action-send">{{ 'ui.action.send'|trans }}</button>
+            {# TODO {{ 'ui.note'|trans }} #}
+        </form>
+        <div id="wz-list-tries">
+            {# <div data-highlight="${hash}"><span class="wz-tries">${hashes.length}</span><span class="wz-word">${value}</span><span>${wordElements.length}</span></div> #}
+        </div>
+    </div>
+    </div>
+    <script src="/sha1.min.js?v={{ version }}" defer></script>
+    <script src="/index.js?v={{ version }}" defer></script>
+{% endblock %}

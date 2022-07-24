@@ -6,6 +6,10 @@
 parameters:
 
 services:
+    _instanceof:
+        App\Language\LanguageInterface:
+            tags: [ 'language' ]
+
     # default configuration for services in *this* file
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
@@ -18,6 +22,10 @@ services:
         exclude:
             - '../src/DependencyInjection/'
             - '../src/Kernel.php'
+
+    App\Controller\IndexController:
+        arguments:
+            $languageProvider: !tagged_locator { tag: 'language', index_by: 'key', default_index_method: 'lang' }
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
