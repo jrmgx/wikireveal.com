@@ -31,13 +31,13 @@ class BuildCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        $staticDirectory = __DIR__.'/../../static';
+        $docsDirectory = __DIR__.'/../../docs';
         $assetDirectory = __DIR__.'/../../public';
         $date = (new DateTimeImmutable())->format('Ymd');
         $filesystem = new Filesystem();
 
-        if (!$filesystem->exists($staticDirectory)) {
-            $io->error('/static directory does not exist.');
+        if (!$filesystem->exists($docsDirectory)) {
+            $io->error('/docs directory does not exist.');
 
             return Command::FAILURE;
         }
@@ -53,7 +53,7 @@ class BuildCommand extends Command
             }
 
             $io->info('Copying '.$asset);
-            $filesystem->copy($file, $staticDirectory.'/'.$asset);
+            $filesystem->copy($file, $docsDirectory.'/'.$asset);
         }
 
         // Index
@@ -64,7 +64,7 @@ class BuildCommand extends Command
 
             return Command::FAILURE;
         }
-        file_put_contents($staticDirectory.'/index.html', $response->getContent());
+        file_put_contents($docsDirectory.'/index.html', $response->getContent());
 
         // Puzzle of the day for each lang
         foreach ($this->languageProvider->getProvidedServices() as $lang => $class) {
@@ -83,11 +83,11 @@ class BuildCommand extends Command
             }
 
             $filesystem->mkdir([
-                $staticDirectory.'/'.$lang,
-                $staticDirectory.'/'.$lang.'/'.$date,
+                $docsDirectory.'/'.$lang,
+                $docsDirectory.'/'.$lang.'/'.$date,
             ]);
-            file_put_contents($staticDirectory.'/'.$lang.'/index.html', $response->getContent());
-            file_put_contents($staticDirectory.'/'.$lang.'/'.$date.'/index.html', $response->getContent());
+            file_put_contents($docsDirectory.'/'.$lang.'/index.html', $response->getContent());
+            file_put_contents($docsDirectory.'/'.$lang.'/'.$date.'/index.html', $response->getContent());
         }
 
         return Command::SUCCESS;
