@@ -50,7 +50,7 @@ class IndexController extends AbstractController
     }
 
     #[Route(path: '/{_locale}')]
-    public function wikinize(Request $request): Response
+    public function wikireveal(Request $request): Response
     {
         $lang = $request->getLocale();
         $dateInt = (int) (new DateTimeImmutable())->format('Ymd');
@@ -114,7 +114,7 @@ class IndexController extends AbstractController
             }
         }
 
-        return $this->render('wikinize.html.twig', [
+        return $this->render('wikireveal.html.twig', [
             'lang' => $lang,
             'outputs' => $outputs,
             'puzzle_id' => $puzzleId,

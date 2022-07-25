@@ -75,7 +75,7 @@ class BuildCommand extends Command
             $request = new Request();
             $request->setLocale($lang);
 
-            $response = $this->indexController->wikinize($request);
+            $response = $this->indexController->wikireveal($request);
             if (200 !== $response->getStatusCode()) {
                 $io->error('Something went wrong.');
 

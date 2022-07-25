@@ -1,4 +1,4 @@
-# built with command `docker build . -t jrmgx/wikinize`
+# built with command `docker build . -t jrmgx/wikireveal`
 FROM php:8.1-cli
 
 RUN apt -y update \

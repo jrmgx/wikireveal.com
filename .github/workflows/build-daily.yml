@@ -18,12 +18,12 @@ jobs:
                   token: ${{ secrets.PAT }}
 
             - name: Composer install
-              uses: docker://jrmgx/wikinize
+              uses: docker://jrmgx/wikireveal
               with:
                   args: composer install
 
             - name: Build
-              uses: docker://jrmgx/wikinize
+              uses: docker://jrmgx/wikireveal
               with:
                   args: bin/console app:build
 
