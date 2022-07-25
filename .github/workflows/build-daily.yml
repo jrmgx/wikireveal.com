@@ -1,0 +1,33 @@
+name: build-daily
+on:
+    schedule:
+        # Every day at 1am
+        - cron:  '0 1 * * *'
+
+defaults:
+    run:
+        shell: bash
+
+jobs:
+    build-daily:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+              with:
+                  token: ${{ secrets.PAT }}
+
+            - name: Composer install
+              uses: docker://jrmgx/wikinize
+              with:
+                  args: composer install
+
+            - name: Build
+              uses: docker://jrmgx/wikinize
+              with:
+                  args: bin/console app:build
+
+            - name: Publish new Puzzle
+              uses: stefanzweifel/git-auto-commit-action@v4
+              with:
+                  commit_message: New Puzzle of the day!
