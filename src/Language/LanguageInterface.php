@@ -6,15 +6,27 @@ interface LanguageInterface
 {
     public static function lang(): string;
 
+    public function langName(): string;
+
     /**
      * Given a word, return a version without accents/diacritics, and in lowercase.
-     * The goal is: when the player enter a word, it would reveal similar ones.
      */
     public function normalize(string $word): string;
 
     /**
+     * Given a normalized word, return different possible versions of it.
+     * The goal is: when the player enter a word, it would reveal similar ones.
+     * It can be for example plural, singular, feminine or conjugated versions.
+     * You choose how far you want to go and then explicit it for the player in the ui.note.
+     *
+     * @return array<string>
+     */
+    public function variations(string $normalized): array;
+
+    /**
      * Return the list of most common word for that language.
      * Those words will be given at start.
+     * They must be normalized.
      *
      * @return array<int, string>
      */

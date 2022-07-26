@@ -1,8 +1,8 @@
 (function main() {
   // For debug
-  const log = (message) => console.log(message);
+  // const log = (message) => console.log(message);
   // eslint-disable-next-line no-unused-vars
-  // const log = (message) => {};
+  const log = (message) => {};
 
   // From template
   const { uiMessages } = window;
@@ -102,7 +102,7 @@
    */
   const revealHash = (hash) => {
     log(`Revealing hash ${hash}`);
-    return reveal(`[data-hash="${hash}"]`);
+    return reveal(`[data-hash*="${hash}"]`);
   };
 
   /**
@@ -122,7 +122,7 @@
     }
 
     let i = 0;
-    const words = document.querySelectorAll(`[data-hash="${currentHighlightedHash}"]`);
+    const words = document.querySelectorAll(`[data-hash*="${currentHighlightedHash}"]`);
     highlightedHashesIndex %= words.length;
     words.forEach((element) => {
       element.classList.add('wz-highlight');
@@ -171,7 +171,7 @@
    */
   const insertWord = (word) => {
     const normalized = normalize(word);
-    const hash = sha1(normalized);
+    const hash = sha1(normalized).substring(0, 10);
 
     hashes.push(hash);
 
@@ -196,7 +196,7 @@
     }
 
     const normalized = normalize(word);
-    const hash = sha1(normalized);
+    const hash = sha1(normalized).substring(0, 10);
 
     if (hashes.indexOf(hash) !== -1) {
       showMessageToUser(uiMessages.already_sent);
@@ -204,12 +204,7 @@
       return;
     }
 
-    hashes.push(hash);
-
-    const winHashIndex = winHashes.indexOf(hash);
-    if (winHashIndex !== -1) {
-      winHashes.splice(winHashIndex, 1);
-    }
+    insertWord(word);
 
     // Win condition
     if (winHashes.length === 0) {

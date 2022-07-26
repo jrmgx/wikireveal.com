@@ -35,22 +35,23 @@ class IndexController extends AbstractController
     }
 
     #[Route('/')]
-    public function index(): Response
+    public function index(string $assetVersion = 'assets'): Response
     {
         $langages = [];
         foreach ($this->languageProvider->getProvidedServices() as $lang => $class) {
             /** @var LanguageInterface $langage */
             $langage = $this->languageProvider->get($lang);
-            $langages[] = $langage->lang();
+            $langages[$langage->lang()] = $langage->langName();
         }
 
         return $this->render('index.html.twig', [
+            'asset_version' => $assetVersion,
             'languages' => $langages,
         ]);
     }
 
     #[Route(path: '/{_locale}')]
-    public function wikireveal(Request $request): Response
+    public function wikireveal(Request $request, string $assetVersion = 'assets'): Response
     {
         $lang = $request->getLocale();
         $dateInt = (int) (new DateTimeImmutable())->format('Ymd');
@@ -72,8 +73,8 @@ class IndexController extends AbstractController
         }
 
         // To win the player has to find all the meaningful words of the subject,
-        $subject = $this->decodeSubject($article);
         // so we are filtering the others.
+        $subject = $this->decodeSubject($article);
         $winTokens = $this->tokenize($subject);
         // Remove one-letter and non-alphabetical tokens: https://regex101.com/r/jVVLjx/1
         $winTokens = array_filter($winTokens, fn (string $e) => !preg_match('/^(.|[^a-z]+?)$/misu', $e));
@@ -96,7 +97,6 @@ class IndexController extends AbstractController
 
         $outputs = [];
         foreach ($tokens as $token) {
-            $normalized = $language->normalize($token);
             if ($this->isHtmlMarkup($token)) {
                 $outputs[] = $token;
             } elseif ($this->hasQuote($token)) {
@@ -104,17 +104,19 @@ class IndexController extends AbstractController
             } elseif (($ponctuationSize = $language->isPonctuation($token)) !== false) {
                 $outputs[] = '<span class="wz-w-ponctuation-'.$ponctuationSize.'">'.$token.'</span>';
             } else {
-                $hash = $this->getHash($normalized);
+                $normalized = $language->normalize($token);
+                $hashes = implode('|', array_map($this->getHash(...), $language->variations($normalized)));
                 $size = $this->getSize($token);
                 $encoded = $this->getEncoded($token);
                 $placeholder = $this->getPlaceholder($size);
-                $outputs[] = '<span data-hash="'.$hash.'" class="wz-w-hide" data-size="'.$size.'" data-word="'.$encoded.'">'.$placeholder.'</span>';
+                $outputs[] = '<span data-hash="'.$hashes.'" class="wz-w-hide" data-size="'.$size.'" data-word="'.$encoded.'">'.$placeholder.'</span>';
                 // For debug
                 // $outputs[] = '<span data-hash="'.$hash.'" class="wz-w-hide" data-size="'.$size.'" data-word="'.$encoded.'">'.$token.'</span>';
             }
         }
 
         return $this->render('wikireveal.html.twig', [
+            'asset_version' => $assetVersion,
             'lang' => $lang,
             'outputs' => $outputs,
             'puzzle_id' => $puzzleId,
@@ -134,7 +136,7 @@ class IndexController extends AbstractController
 
     private function hasQuote(string $candidate): bool
     {
-        return str_contains($candidate, "'");
+        return (bool) preg_match('/[’\']/miu', $candidate);
     }
 
     private function getPlaceholder(int $size): string
@@ -147,9 +149,9 @@ class IndexController extends AbstractController
         return mb_strlen($word);
     }
 
-    private function getHash(string $word): string
+    private function getHash(string $normalized): string
     {
-        return sha1($word);
+        return mb_substr(sha1($normalized), 0, 10);
     }
 
     private function getEncoded(string $word): string
@@ -242,7 +244,11 @@ class IndexController extends AbstractController
         return $crawler->html();
     }
 
-    // https://github.com/wikimedia/parsoid/blob/master/tests/phpunit/Parsoid/ParsoidTest.php
+    /**
+     * TODO: This code makes http queries even if they are not needed.
+     * TODO: I'm sure this is not optimal but I did not find suffisant documentation
+     * https://github.com/wikimedia/parsoid/blob/master/tests/phpunit/Parsoid/ParsoidTest.php.
+     */
     private function wikiToHtml(string $lang, string $subject, string $wikiData): string
     {
         $wikiApiHelper = new ApiHelper([
@@ -284,8 +290,10 @@ class IndexController extends AbstractController
         }
     }
 
-    // http://htmlpurifier.org/live/configdoc/plain.html#HTML.Allowed
-    // http://htmlpurifier.org/docs/enduser-customize.html
+    /**
+     * http://htmlpurifier.org/live/configdoc/plain.html#HTML.Allowed
+     * http://htmlpurifier.org/docs/enduser-customize.html.
+     */
     private function cleanupMarkup(string $html): string
     {
         $HTMLPurifierConfig = HTMLPurifier_Config::createDefault();
@@ -318,7 +326,7 @@ class IndexController extends AbstractController
     {
         $prepareHtml = str_replace("\n", ' ', $html);
         // Trick to keep quotes around (otherwise they are considered as word boundaries and got removed later)
-        $prepareHtml = str_replace("'", '__QUOTE__ ', $prepareHtml);
+        $prepareHtml = str_replace(["'", '’'], '__QUOTE__ ', $prepareHtml);
         // https://regex101.com/r/fedzhl/1
         $prepareHtml = preg_replace('/(<.*?>|\b|\(|\)|\.|;|-|,)/misu', "\n$1\n", $prepareHtml);
         $prepareHtml = str_replace('__QUOTE__', "'", $prepareHtml);

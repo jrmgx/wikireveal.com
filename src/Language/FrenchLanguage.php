@@ -28,15 +28,14 @@ class FrenchLanguage implements LanguageInterface
         return 'fr';
     }
 
-    /**
-     * We normalize one step more by getting the singular for the given word:
-     * it means that for the French language the word guessed MUST be in singular.
-     * This will be explained in the user interface via ui.note|trans.
-     */
+    public function langName(): string
+    {
+        return 'Français';
+    }
+
     public function normalize(string $word): string
     {
-        $singular = $this->frenchInflector->singularize($word)[0];
-        $transliterated = $this->transliterator->transliterate($singular);
+        $transliterated = $this->transliterator->transliterate($word);
         if (false === $transliterated) {
             return $word;
         }
@@ -44,13 +43,29 @@ class FrenchLanguage implements LanguageInterface
         return mb_strtolower($transliterated);
     }
 
+    /**
+     * We handle singular and plural versions.
+     *
+     * @return string[]
+     */
+    public function variations(string $normalized): array
+    {
+        return array_merge(
+            $this->frenchInflector->singularize($normalized),
+            $this->frenchInflector->pluralize($normalized)
+        );
+    }
+
     public function commonWords(): array
     {
-        return array_map($this->normalize(...), [
-            'le', 'de', 'des', 'un', 'et', 'à', 'ne', 'que', 'se', 'la', 'une',
-            'qui', 'ce', 'dans', 'en', 'du', 'au', 'de', 'ce', 'pour',
-            'pas', 'que', 'par', 'sur', 'comme', 'mais', 'avec', 'y', 'en', 'où', 'sans',
-        ]);
+        // They are already normalized
+        return /* array_map($this->normalize(...), */ [
+            'a', 'au', 'avec', 'car', 'ce', 'comme',
+            'dans', 'de', 'des', 'donc', 'du',
+            'elle', 'en', 'et', 'il', 'la', 'le', 'les', 'mais', 'ne', 'ni',
+            'or', 'ou', 'par', 'pas', 'pour', 'que', 'qui',
+            'sans', 'se', 'sur', 'un', 'une', 'y',
+        ];
     }
 
     public function isPonctuation(string $normalized): int|false
