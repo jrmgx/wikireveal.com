@@ -28,6 +28,8 @@ First you must install the dependencies with: `wikireveal composer install` then
 
 The project is basically a static website generator, the command: `wikireveal bin/console app:build` will generate the daily puzzle ready to be published.
 
+You can test the generated result via: `wikireveal php -S 0.0.0.0:8000 -t docs`. It will start a dumb PHP server where you can check for the result.
+
 It uses Github action to compute the new puzzle every day.
 
 ## Limitations
@@ -50,3 +52,7 @@ There is no framework on the CSS/Javascript side, so it is easy for anyone to pi
 
 The coding style is enforced by PHPCS and ESLint, you can simply launch those command before sending your PR:
 `wikireveal composer phpcs-fix` and `wikireveal composer eslint-fix`
+
+# Donate to Wikipedia
+
+Please consider a donation to [Wikipedia](https://donate.wikimedia.org/wiki/Special:FundraiserRedirector?utm_source=donate&utm_medium=sidebar&utm_campaign=C13_en.wikipedia.org&uselang=en)
