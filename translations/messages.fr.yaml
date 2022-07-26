@@ -2,7 +2,7 @@ header:
     title: "Wikireveal : Trouvez l'article wikipedia caché !"
 
 ui:
-    # Some specific text you want to give to your player # TODO implement in UI
+    # Some specific text you want to give to your player, it can be left blank if not useful
     note: "Attention les mots entrés doivent être au singulier, les versions plurielles sont révélés automatiquement."
     placeholder:
         # We specify singular here because in our Normalizer we find the singular of the given word

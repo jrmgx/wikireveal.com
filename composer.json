@@ -66,10 +66,10 @@
         "symfony/polyfill-php81": "*"
     },
     "scripts": {
-        "eslint": "npx eslint public/index.js",
+        "eslint": "npx eslint public/assets/index.js",
         "phpcs": "vendor/bin/php-cs-fixer fix --dry-run --diff",
         "phpstan": "vendor/bin/phpstan analyse --memory-limit 512M",
-        "eslint-fix": "npx eslint public/index.js --fix && echo 'No error found!'",
+        "eslint-fix": "npx eslint public/assets/index.js --fix && echo 'No error found!'",
         "phpcs-fix": "vendor/bin/php-cs-fixer fix",
         "auto-scripts": {
             "cache:clear": "symfony-cmd",

@@ -24,6 +24,7 @@ class BuildCommand extends Command
         readonly private IndexController $indexController,
         private readonly ServiceProviderInterface $languageProvider,
         private readonly LocaleSwitcher $localeSwitcher,
+        private readonly string $assetVersion,
     ) {
         parent::__construct();
     }
@@ -31,12 +32,12 @@ class BuildCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        $docsDirectory = __DIR__.'/../../docs';
-        $assetDirectory = __DIR__.'/../../public';
+        $docsDirectoryDestination = __DIR__.'/../../docs';
+        $assetDirectorySource = __DIR__.'/../../public/assets';
         $date = (new DateTimeImmutable())->format('Ymd');
         $filesystem = new Filesystem();
 
-        if (!$filesystem->exists($docsDirectory)) {
+        if (!$filesystem->exists($docsDirectoryDestination)) {
             $io->error('/docs directory does not exist.');
 
             return Command::FAILURE;
@@ -44,8 +45,10 @@ class BuildCommand extends Command
 
         // Assets
         $assets = ['index.css', 'index.js', 'sha1.min.js'];
+        $assetDirectoryDestination = $docsDirectoryDestination.'/'.$this->assetVersion;
+        $filesystem->mkdir($assetDirectoryDestination);
         foreach ($assets as $asset) {
-            $file = $assetDirectory.'/'.$asset;
+            $file = $assetDirectorySource.'/'.$asset;
             if (!$filesystem->exists($file)) {
                 $io->error($asset.' asset does not exist.');
 
@@ -53,18 +56,18 @@ class BuildCommand extends Command
             }
 
             $io->info('Copying '.$asset);
-            $filesystem->copy($file, $docsDirectory.'/'.$asset);
+            $filesystem->copy($file, $assetDirectoryDestination.'/'.$asset);
         }
 
         // Index
         $io->info('Generating index.html ...');
-        $response = $this->indexController->index();
+        $response = $this->indexController->index($this->assetVersion);
         if (200 !== $response->getStatusCode()) {
             $io->error('Something went wrong.');
 
             return Command::FAILURE;
         }
-        file_put_contents($docsDirectory.'/index.html', $response->getContent());
+        file_put_contents($docsDirectoryDestination.'/index.html', $response->getContent());
 
         // Puzzle of the day for each lang
         foreach ($this->languageProvider->getProvidedServices() as $lang => $class) {
@@ -75,7 +78,7 @@ class BuildCommand extends Command
             $request = new Request();
             $request->setLocale($lang);
 
-            $response = $this->indexController->wikireveal($request);
+            $response = $this->indexController->wikireveal($request, $this->assetVersion);
             if (200 !== $response->getStatusCode()) {
                 $io->error('Something went wrong.');
 
@@ -83,11 +86,11 @@ class BuildCommand extends Command
             }
 
             $filesystem->mkdir([
-                $docsDirectory.'/'.$lang,
-                $docsDirectory.'/'.$lang.'/'.$date,
+                $docsDirectoryDestination.'/'.$lang,
+                $docsDirectoryDestination.'/'.$lang.'/'.$date,
             ]);
-            file_put_contents($docsDirectory.'/'.$lang.'/index.html', $response->getContent());
-            file_put_contents($docsDirectory.'/'.$lang.'/'.$date.'/index.html', $response->getContent());
+            file_put_contents($docsDirectoryDestination.'/'.$lang.'/index.html', $response->getContent());
+            file_put_contents($docsDirectoryDestination.'/'.$lang.'/'.$date.'/index.html', $response->getContent());
         }
 
         return Command::SUCCESS;

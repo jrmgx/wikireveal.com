@@ -20,13 +20,16 @@
         <form id="wz-form-send">
             <input id="wz-input-guess" type="text" placeholder="{{ 'ui.placeholder.guess'|trans }}">
             <button id="wz-action-send">{{ 'ui.action.send'|trans }}</button>
-            {# TODO {{ 'ui.note'|trans }} #}
+{#            {% set note = 'ui.note'|trans %}#}
+{#            {% if not note is empty %}#}
+{#            <span class="wz-note">{{ note }}</span>#}
+{#            {% endif %}#}
         </form>
         <div id="wz-list-tries">
             {# <div data-highlight="${hash}"><span class="wz-tries">${hashes.length}</span><span class="wz-word">${value}</span><span>${wordElements.length}</span></div> #}
         </div>
     </div>
     </div>
-    <script src="/sha1.min.js?v={{ version }}" defer></script>
-    <script src="/index.js?v={{ version }}" defer></script>
+    <script src="/{{ asset_version }}/sha1.min.js" defer></script>
+    <script src="/{{ asset_version }}/index.js" defer></script>
 {% endblock %}
