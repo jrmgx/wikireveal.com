@@ -1,0 +1,24 @@
+header:
+    title: "WikiReveal : Trouvez l'article wikipedia caché !"
+
+ui:
+    # Some specific instructions you want to give to your player, it can be left blank if not useful
+    note: ""
+    placeholder:
+        guess: "Mot"
+    action:
+        send: "Essayer"
+        share: "Partager votre score"
+
+message:
+    victory: "Bravo vous avez trouvé !"
+    share_public: >-
+        J'ai trouvé le WikiReveal du jour en {count, plural,
+            =0 {zéro essai}
+            one {un essai}
+            other {# essais}
+        } et toi ?
+
+error:
+    already_sent: "Mot déjà proposé"
+    share_error: "Copiez coller cette URL pour partager votre score !"

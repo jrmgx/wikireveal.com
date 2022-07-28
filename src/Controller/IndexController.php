@@ -125,6 +125,9 @@ class IndexController extends AbstractController
             'ui_messages' => [
                 'victory' => $this->translator->trans('message.victory'),
                 'already_sent' => $this->translator->trans('error.already_sent'),
+                'share' => $this->translator->trans('ui.action.share'),
+                'share_public' => $this->translator->trans('message.share_public', ['count' => 999]),
+                'share_error' => $this->translator->trans('error.share_error'),
             ],
         ]);
     }
