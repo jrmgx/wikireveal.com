@@ -35,17 +35,45 @@
     });
   };
 
+  const shareWin = (e) => {
+    const navigatorShare = window.navigator;
+    const title = uiMessages.share_public.replace('999', hashes.length - commonWords.length);
+    log(title);
+    const shareObject = { title, url: document.location };
+    if (navigatorShare.share && navigatorShare.canShare && navigatorShare.canShare(shareObject)) {
+      navigatorShare.share(shareObject)
+        .then(() => { log('Share succeed!'); })
+        .catch((error) => {
+          // eslint-disable-next-line no-alert
+          prompt(uiMessages.share_error, shareObject.url);
+          log(error);
+        });
+    } else {
+      // eslint-disable-next-line no-alert
+      prompt(uiMessages.share_error, shareObject.url);
+    }
+
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
   /**
    * Show a message in the UI
    * @param message {string} The message to show
+   * @param won {boolean} Show sharing button
    */
-  const showMessageToUser = (message) => {
+  const showMessageToUser = (message, won) => {
     messageSendElement.innerHTML = message;
+    if (won) {
+      messageSendElement.innerHTML = `<span>${message}</span><br><a href="#" class="wz-share">${uiMessages.share}</a>`;
+      messageSendElement.addEventListener('click', shareWin);
+    } else {
+      setTimeout(() => {
+        messageSendElement.classList.remove('wz-show');
+        messageSendElement.innerHTML = '';
+      }, 2500);
+    }
     messageSendElement.classList.add('wz-show');
-    setTimeout(() => {
-      messageSendElement.classList.remove('wz-show');
-      messageSendElement.innerHTML = '';
-    }, 2500);
   };
 
   /**
@@ -199,7 +227,7 @@
     const hash = sha1(normalized).substring(0, 10);
 
     if (hashes.indexOf(hash) !== -1) {
-      showMessageToUser(uiMessages.already_sent);
+      showMessageToUser(uiMessages.already_sent, false);
       guessInput.value = '';
       return;
     }
@@ -208,7 +236,7 @@
 
     // Win condition
     if (winHashes.length === 0) {
-      showMessageToUser(uiMessages.victory);
+      showMessageToUser(uiMessages.victory, true);
       revealAll();
     }
 
@@ -241,7 +269,7 @@
 
     // Win condition
     if (winHashes.length === 0) {
-      showMessageToUser(uiMessages.victory);
+      showMessageToUser(uiMessages.victory, true);
       revealAll();
     }
 

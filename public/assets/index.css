@@ -49,7 +49,8 @@ h3 {
 }
 
 .wz-section a,
-.wz-section a:hover {
+.wz-section a:hover,
+a.wz-share, a.wz-share:hover {
     text-decoration: none;
     color: #0055aa;
     font-weight: bold;
