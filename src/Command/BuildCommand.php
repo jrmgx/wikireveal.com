@@ -10,6 +10,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Translation\LocaleSwitcher;
 use Symfony\Contracts\Service\ServiceProviderInterface;
@@ -44,19 +45,12 @@ class BuildCommand extends Command
         }
 
         // Assets
-        $assets = ['index.css', 'index.js', 'sha1.min.js'];
+        $assets = (new Finder())->in($assetDirectorySource);
         $assetDirectoryDestination = $docsDirectoryDestination.'/'.$this->assetVersion;
         $filesystem->mkdir($assetDirectoryDestination);
         foreach ($assets as $asset) {
-            $file = $assetDirectorySource.'/'.$asset;
-            if (!$filesystem->exists($file)) {
-                $io->error($asset.' asset does not exist.');
-
-                return Command::FAILURE;
-            }
-
-            $io->info('Copying '.$asset);
-            $filesystem->copy($file, $assetDirectoryDestination.'/'.$asset);
+            $io->info('Copying '.$asset->getFilename());
+            $filesystem->copy($asset->getRealPath(), $assetDirectoryDestination.'/'.$asset->getFilename());
         }
 
         // Index

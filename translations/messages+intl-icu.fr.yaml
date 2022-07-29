@@ -1,5 +1,6 @@
 header:
     title: "WikiReveal : Trouvez l'article wikipedia caché !"
+    description: "WikiReveal est un jeu journalier ou il faut trouver le sujet de la page wikipedia cachée. Un nouveau article est disponible tous les jours à 3:00 AM UTC."
 
 ui:
     # Some specific instructions you want to give to your player, it can be left blank if not useful
