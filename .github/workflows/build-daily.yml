@@ -1,7 +1,8 @@
 name: build-daily
 on:
+    workflow_dispatch: ~
     schedule:
-        # Every day at 1am
+        # Every day at 3am UTC
         - cron:  '0 3 * * *'
 
 defaults:
