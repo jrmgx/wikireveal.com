@@ -1,5 +1,5 @@
 {% extends 'base.html.twig' %}
-{% block title %}{{ 'header.title'|trans }}{% endblock %}
+
 {% block body %}
     <script>
         window.commonWords = {{ common_words|json_encode|raw }};

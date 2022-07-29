@@ -1,0 +1,24 @@
+header:
+    title: "WikiReveal: Find the Wikipedia Page Behind the Redacted Words"
+    description: "WikiReveal is a daily browser game where the player have to determine the subject of a random obfuscated Wikipedia article. A new puzzle will be available every day at 3:00 AM UTC."
+
+ui:
+    note: ""
+    placeholder:
+        guess: "Word"
+    action:
+        send: "Guess"
+        share: "Share your score"
+
+message:
+    victory: "Congratulation you won!"
+    share_public: >-
+        I found the daily WikiReveal in {count, plural,
+            =0 {zero try}
+            one {one try}
+            other {# tries}
+        } and you?
+
+error:
+    already_sent: "Already tried"
+    share_error: "Copy/past this URL to share your score!"

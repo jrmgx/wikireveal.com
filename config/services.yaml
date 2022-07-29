@@ -6,6 +6,7 @@
 parameters:
     # This has to be incremented when a new asset is incompatible with the previous version
     asset_version: 'assets/2'
+    domain: 'https://wikireveal.com'
 
 services:
     _instanceof:
