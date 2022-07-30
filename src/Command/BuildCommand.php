@@ -50,7 +50,11 @@ class BuildCommand extends Command
         $filesystem->mkdir($assetDirectoryDestination);
         foreach ($assets as $asset) {
             $io->info('Copying '.$asset->getFilename());
-            $filesystem->copy($asset->getRealPath(), $assetDirectoryDestination.'/'.$asset->getFilename());
+            $filesystem->copy(
+                $asset->getRealPath(),
+                $assetDirectoryDestination.'/'.$asset->getFilename(),
+                true
+            );
         }
 
         // Index
