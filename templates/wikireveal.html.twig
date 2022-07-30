@@ -8,27 +8,28 @@
         window.puzzleId = {{ puzzle_id|json_encode|raw }};
     </script>
     <div class="wz-container">
-    <div class="wz-text">
-        <div class="wz-words">
-            {% for token in outputs %}
-            {{ token|raw }}
-            {% endfor %}
+        <div class="wz-text">
+            <div class="wz-words">
+                {% for token in outputs %}
+                {{ token|raw }}
+                {% endfor %}
+            </div>
+            <span class="wz-top">{{ 'ui.action.top'|trans }}</span>
         </div>
-    </div>
-    <div class="wz-ui">
-        <div id="wz-message-send"></div>
-        <form id="wz-form-send">
-            <input id="wz-input-guess" type="text" placeholder="{{ 'ui.placeholder.guess'|trans }}">
-            <button id="wz-action-send">{{ 'ui.action.send'|trans }}</button>
-{#            {% set note = 'ui.note'|trans %}#}
-{#            {% if not note is empty %}#}
-{#            <span class="wz-note">{{ note }}</span>#}
-{#            {% endif %}#}
-        </form>
-        <div id="wz-list-tries">
-            {# <div data-highlight="${hash}"><span class="wz-tries">${hashes.length}</span><span class="wz-word">${value}</span><span>${wordElements.length}</span></div> #}
+        <div class="wz-ui">
+            <div id="wz-message-send"></div>
+            <form id="wz-form-send">
+                <input id="wz-input-guess" type="text" placeholder="{{ 'ui.placeholder.guess'|trans }}">
+                <button id="wz-action-send">{{ 'ui.action.send'|trans }}</button>
+{#                  {% set note = 'ui.note'|trans %}#}
+{#                  {% if not note is empty %}#}
+{#                  <span class="wz-note">{{ note }}</span>#}
+{#                  {% endif %}#}
+            </form>
+            <div id="wz-list-tries">
+                {# <div data-highlight="${hash}"><span class="wz-tries">${hashes.length}</span><span class="wz-word">${value}</span><span>${wordElements.length}</span></div> #}
+            </div>
         </div>
-    </div>
     </div>
     <script src="/{{ asset_version_major }}/sha1.min.js?v={{ asset_version_minor }}" defer></script>
     <script src="/{{ asset_version_major }}/index.js?v={{ asset_version_minor }}" defer></script>

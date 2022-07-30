@@ -9,6 +9,7 @@ ui:
     action:
         send: "Guess"
         share: "Share your score"
+        top: "⬆︎"
 
 message:
     victory: "Congratulation you won!"

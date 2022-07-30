@@ -72,6 +72,19 @@ a.wz-share, a.wz-share:hover {
     overflow: auto;
 }
 
+.wz-top {
+    position: fixed;
+    bottom: 30%;
+    right: 1rem;
+    padding: 1rem;
+    border-radius: 5px 0 0 0;
+    cursor: pointer;
+    text-decoration: none;
+    font-weight: bold;
+    background: rgba(0,0,0,.3);
+    color: #080808;
+}
+
 .wz-w-hide {
     background: #DFDFDF;
 }
@@ -205,6 +218,11 @@ form #wz-action-send {
         background: black;
     }
 
+    .wz-top {
+        color: white;
+        background: rgba(255,255,255,.3);
+    }
+
     .wz-text {
         background: #080808;
     }
@@ -248,6 +266,12 @@ form #wz-action-send {
         width: 26%;
         width: calc(30% - 3.5rem);
         /* TODO continue to work on this case */
+    }
+
+    .wz-top {
+        right: 30%;
+        bottom: 0;
+        padding-right: 2rem;
     }
 
     .wz-text {
