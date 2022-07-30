@@ -45,7 +45,7 @@ class IndexController extends AbstractController
         }
 
         return $this->render('index.html.twig', [
-            'asset_version' => $assetVersion,
+            'asset_version_major' => $assetVersion,
             'languages' => $langages,
         ]);
     }
@@ -116,7 +116,7 @@ class IndexController extends AbstractController
         }
 
         return $this->render('wikireveal.html.twig', [
-            'asset_version' => $assetVersion,
+            'asset_version_major' => $assetVersion,
             'lang' => $lang,
             'outputs' => $outputs,
             'puzzle_id' => $puzzleId,

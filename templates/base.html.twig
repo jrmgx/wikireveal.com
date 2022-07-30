@@ -1,31 +1,35 @@
 <!DOCTYPE html>
-{% set lang = lang|default('en') %}
-<html lang="{{ lang }}">
+{% if lang is defined %}
+    {% set url = domain ~ path('app_index_wikireveal', { _locale: lang }) %}
+{% else %}
+    {% set url = domain %}
+{% endif %}
+<html lang="{{ lang|default('en') }}">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>{{ 'header.title'|trans }}</title>
-    <link rel="stylesheet" href="/{{ asset_version }}/index.css">
+    <link rel="stylesheet" href="/{{ asset_version_major }}/index.css?v={{ asset_version_minor }}">
 
     <meta name="title" content="{{ 'header.title'|trans }}">
     <meta name="description" content="{{ 'header.description'|trans }}">
 
     <meta property="og:type" content="website">
-    <meta property="og:url" content="{{ domain }}{{ path('app_index_wikireveal', { _locale: lang }) }}">
+    <meta property="og:url" content="{{ url }}">
     <meta property="og:title" content="{{ 'header.title'|trans }}">
     <meta property="og:description" content="{{ 'header.description'|trans }}">
-    <meta property="og:image" content="/{{ asset_version }}/og_image.png">
+    <meta property="og:image" content="/{{ asset_version_major }}/og_image.png">
 
     <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="{{ domain }}{{ path('app_index_wikireveal', { _locale: lang }) }}">
+    <meta property="twitter:url" content="{{ url }}">
     <meta property="twitter:title" content="{{ 'header.title'|trans }}">
     <meta property="twitter:description" content="{{ 'header.description'|trans }}">
-    <meta property="twitter:image" content="/{{ asset_version }}/og_image.png">
+    <meta property="twitter:image" content="/{{ asset_version_major }}/og_image.png">
 
-    <link rel="apple-touch-icon" sizes="180x180" href="/{{ asset_version }}/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/{{ asset_version }}/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/{{ asset_version }}/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/{{ asset_version_major }}/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/{{ asset_version_major }}/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/{{ asset_version_major }}/favicon-16x16.png">
 
 </head>
 <body>

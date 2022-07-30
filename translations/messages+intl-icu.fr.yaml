@@ -22,4 +22,4 @@ message:
 
 error:
     already_sent: "Mot déjà proposé"
-    share_error: "Copiez coller cette URL pour partager votre score !"
+    share_error: "Copiez coller ce texte pour partager votre score !"

@@ -45,12 +45,12 @@
         .then(() => { log('Share succeed!'); })
         .catch((error) => {
           // eslint-disable-next-line no-alert
-          prompt(uiMessages.share_error, shareObject.url);
+          prompt(uiMessages.share_error, `${title} ${shareObject.url}`);
           log(error);
         });
     } else {
       // eslint-disable-next-line no-alert
-      prompt(uiMessages.share_error, shareObject.url);
+      prompt(uiMessages.share_error, `${title} ${shareObject.url}`);
     }
 
     e.preventDefault();
