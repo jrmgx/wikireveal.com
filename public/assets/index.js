@@ -14,6 +14,7 @@
   const hashes = [];
   let currentHighlightedHash = '';
   let highlightedHashesIndex = 0;
+  let wantFocusBack = null;
 
   // DOM
   const guessInput = document.getElementById('wz-input-guess');
@@ -322,6 +323,15 @@
       top: 0, left: 0, behavior: 'smooth',
     });
   });
+  document.addEventListener('click', () => {
+    if (wantFocusBack) {
+      clearTimeout(wantFocusBack);
+    }
+    wantFocusBack = setTimeout(() => {
+      wantFocusBack = null;
+      guessInput.focus();
+    }, 1000);
+  });
 
   // Load the game
   log(`Loading game for puzzle id "${puzzleId}" ...`);
@@ -338,4 +348,6 @@
     log(`No game state for puzzle id "${puzzleId}", clearing previous`);
     localStorage.clear(); // Clear all previous plays TODO is this really useful?
   }
+
+  guessInput.focus();
 }());
