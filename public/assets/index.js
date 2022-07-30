@@ -18,6 +18,7 @@
   // DOM
   const guessInput = document.getElementById('wz-input-guess');
   const sendAction = document.getElementById('wz-action-send');
+  const scrollTopAction = document.querySelector('.wz-top');
   const sendForm = document.getElementById('wz-form-send');
   const listTriesElement = document.getElementById('wz-list-tries');
   const messageSendElement = document.getElementById('wz-message-send');
@@ -315,6 +316,12 @@
 
   sendAction.addEventListener('click', evenListener);
   sendForm.addEventListener('submit', evenListener);
+  scrollTopAction.addEventListener('click', (e) => {
+    e.preventDefault();
+    document.querySelector('.wz-text').scrollTo({
+      top: 0, left: 0, behavior: 'smooth',
+    });
+  });
 
   // Load the game
   log(`Loading game for puzzle id "${puzzleId}" ...`);

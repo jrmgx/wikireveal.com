@@ -10,6 +10,7 @@ ui:
     action:
         send: "Essayer"
         share: "Partager votre score"
+        top: "⬆︎"
 
 message:
     victory: "Bravo vous avez trouvé !"
