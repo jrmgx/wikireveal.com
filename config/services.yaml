@@ -5,7 +5,8 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     # This has to be incremented when a new asset is incompatible with the previous version
-    asset_version: 'assets/2'
+    asset_version_major: 'assets/2'
+    asset_version_minor: 2
     domain: 'https://wikireveal.com'
 
 services:
@@ -32,5 +33,5 @@ services:
 
     App\Command\BuildCommand:
         arguments:
-            $assetVersion: '%asset_version%'
+            $assetVersion: '%asset_version_major%'
             $languageProvider: !tagged_locator { tag: 'language', index_by: 'key', default_index_method: 'lang' }

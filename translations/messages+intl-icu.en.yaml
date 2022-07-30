@@ -21,4 +21,4 @@ message:
 
 error:
     already_sent: "Already tried"
-    share_error: "Copy/past this URL to share your score!"
+    share_error: "Copy/past this text to share your score!"

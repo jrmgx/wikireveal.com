@@ -30,6 +30,6 @@
         </div>
     </div>
     </div>
-    <script src="/{{ asset_version }}/sha1.min.js" defer></script>
-    <script src="/{{ asset_version }}/index.js" defer></script>
+    <script src="/{{ asset_version_major }}/sha1.min.js?v={{ asset_version_minor }}" defer></script>
+    <script src="/{{ asset_version_major }}/index.js?v={{ asset_version_minor }}" defer></script>
 {% endblock %}

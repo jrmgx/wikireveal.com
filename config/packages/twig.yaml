@@ -2,6 +2,7 @@ twig:
     default_path: '%kernel.project_dir%/templates'
     globals:
         domain: '%domain%'
+        asset_version_minor: '%asset_version_minor%'
 
 when@test:
     twig:
