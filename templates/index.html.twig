@@ -15,7 +15,7 @@
         <div>
             <h2>Available languages</h2>
             <ul>
-                <li><a href="https://redactle.com">English: see Redactle.com</a></li>
+                <li><a href="https://redactle.com">English (the original): see Redactle.com</a></li>
                 {% for lang, language in languages %}
                 <li><a href="{{ path('app_index_wikireveal', {'_locale': lang}) }}">{{ language }}</a></li>
                 {% endfor %}

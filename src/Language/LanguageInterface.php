@@ -69,11 +69,12 @@ interface LanguageInterface
      * var links = [];
      * // Adapt for other languages
      * var list = document.querySelectorAll(
-     *     '[title="Article de qualité"],[title="Bon article"],[title="Avancement A"],[title="Avancement B"]'
+     *     '[title="Featured article"],[title="Good article"],[title="A-Class article"],[title="B-Class article"]'
      * );
      * for (let e of list) {
-     *     let a = e.parentNode.querySelector('a');
-     *     if (!a) continue;
+     *     let as = e.parentNode.querySelectorAll('a');
+     *     if (as.length === 0) continue;
+     *     let a = as[as.length - 1];
      *     if (!a.href.startsWith('')) continue;
      *     links.push(a.href);
      * }
