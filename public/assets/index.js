@@ -1,8 +1,8 @@
 (function main() {
   // For debug
-  // const log = (message) => console.log(message);
+  const log = (message) => console.log(message);
   // eslint-disable-next-line no-unused-vars
-  const log = (message) => {};
+  // const log = (message) => {};
 
   // From template
   const { uiMessages } = window;
@@ -15,6 +15,7 @@
   let currentHighlightedHash = '';
   let highlightedHashesIndex = 0;
   let wantFocusBack = null;
+  let hiddenWordCount = 0;
 
   // DOM
   const guessInput = document.getElementById('wz-input-guess');
@@ -35,6 +36,11 @@
         handler(event);
       }
     });
+  };
+
+  const stats = () => {
+    const notFound = document.querySelectorAll('.wz-w-hide').length;
+    log(`${hiddenWordCount - notFound} / ${hiddenWordCount}`);
   };
 
   const shareWin = (e) => {
@@ -248,6 +254,8 @@
     addToList(hash, hashes.length - commonWords.length, word, count);
     saveWord(word);
 
+    stats();
+
     guessInput.value = '';
   };
 
@@ -336,6 +344,7 @@
   // Load the game
   log(`Loading game for puzzle id "${puzzleId}" ...`);
   commonWords.forEach(insertCommonWord);
+  hiddenWordCount = document.querySelectorAll('.wz-w-hide').length;
 
   // Reload data
   const item = localStorage.getItem(puzzleId);
@@ -348,6 +357,7 @@
     log(`No game state for puzzle id "${puzzleId}", clearing previous`);
     localStorage.clear(); // Clear all previous plays TODO is this really useful?
   }
+  stats();
 
   guessInput.focus();
 }());
