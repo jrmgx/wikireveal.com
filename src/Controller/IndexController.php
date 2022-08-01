@@ -7,7 +7,6 @@ use DateTimeImmutable;
 use Exception;
 use HTMLPurifier;
 use HTMLPurifier_Config;
-use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DomCrawler\Crawler;
@@ -17,18 +16,11 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\Service\ServiceProviderInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Wikimedia\Parsoid\Config\Api\ApiHelper;
-use Wikimedia\Parsoid\Config\Api\DataAccess;
-use Wikimedia\Parsoid\Config\Api\PageConfig;
-use Wikimedia\Parsoid\Config\Api\SiteConfig;
-use Wikimedia\Parsoid\Core\PageBundle;
-use Wikimedia\Parsoid\Parsoid;
 
 class IndexController extends AbstractController
 {
     public function __construct(
         private readonly HttpClientInterface $httpClient,
-        private readonly LoggerInterface $logger,
         private readonly TranslatorInterface $translator,
         private readonly ServiceProviderInterface $languageProvider,
     ) {
@@ -67,8 +59,8 @@ class IndexController extends AbstractController
             // TODO link to github explain how to build one
         }
 
-        $getPage = $this->cache('getPage-'.$puzzleId.'.json', fn () => $this->getPage($article, $lang));
-        if (!isset($getPage['query']['pages'][0]['revisions'][0]['slots']['main']['content'])) {
+        $pageHtml = $this->cache('pageHtml-'.$puzzleId.'.json', fn () => $this->getPageHtml($article, $lang));
+        if (!isset($pageHtml['parse']['text'])) {
             throw new RuntimeException('Malformed JSON Content.');
         }
 
@@ -84,8 +76,7 @@ class IndexController extends AbstractController
         $winTokens = array_map($this->getHash(...), $winTokens);
         $winTokens = array_values($winTokens);
 
-        $wikiData = $getPage['query']['pages'][0]['revisions'][0]['slots']['main']['content'];
-        $wikiHtml = $this->cache('wikiToHtml-'.$puzzleId.'.html', fn () => $this->wikiToHtml($lang, $subject, $wikiData));
+        $wikiHtml = $pageHtml['parse']['text'];
 
         $cleanHtml = $this->removeUnwantedBlocks($wikiHtml, $language);
 
@@ -163,23 +154,18 @@ class IndexController extends AbstractController
     }
 
     /**
-     * pages.0.revisions.0.slot.main.content
-     * https://www.mediawiki.org/wiki/API:Get_the_contents_of_a_page.
+     * .parse.text
+     * https://www.mediawiki.org/wiki/API:Get_the_contents_of_a_page#Method_2:_Use_the_Parse_API.
      *
      * @return array<mixed>
      */
-    private function getPage(string $subject, string $lang): array
+    private function getPageHtml(string $subject, string $lang): array
     {
+        // https://en.wikipedia.org/w/api.php?action=parse&format=json&page=Pet_door&prop=text&formatversion=2
         $response = $this->httpClient->request(
             'GET',
             "https://$lang.wikipedia.org/w/api.php".
-            '?action=query'.
-            '&format=json'.
-            '&prop=revisions'.
-            "&titles=$subject".
-            '&formatversion=2'.
-            '&rvprop=content'.
-            '&rvslots=*'
+            "?action=parse&format=json&page=$subject&prop=text&formatversion=2"
         );
         $content = $response->getContent();
 
@@ -223,6 +209,12 @@ class IndexController extends AbstractController
                 $crawler->matches('link') ||
                 $crawler->matches('.navbar') ||
                 $crawler->matches('.infobox_v3') ||
+                $crawler->matches('.infobox_v2') ||
+                $crawler->matches('.reference') ||
+                $crawler->matches('.noprint') ||
+                $crawler->matches('.toc') ||
+                $crawler->matches('.mw-editsection') ||
+                $crawler->matches('.thumb.tright') ||
                 $crawler->matches('a[href$="\.ogg"]') ||
                 $crawler->matches('.mw-reflink-text') ||
                 $crawler->matches('figcaption') ||
@@ -245,42 +237,6 @@ class IndexController extends AbstractController
         });
 
         return $crawler->html();
-    }
-
-    /**
-     * TODO: This code makes http queries even if they are not needed.
-     * TODO: I'm sure this is not optimal but I did not find suffisant documentation
-     * https://github.com/wikimedia/parsoid/blob/master/tests/phpunit/Parsoid/ParsoidTest.php.
-     */
-    private function wikiToHtml(string $lang, string $subject, string $wikiData): string
-    {
-        $wikiApiHelper = new ApiHelper([
-            'apiEndpoint' => "https://$lang.wikipedia.org/w/api.php",
-        ]);
-        $wikiSiteConfig = new SiteConfig($wikiApiHelper, [
-            'logger' => $this->logger,
-        ]);
-        $wikiDataAccess = new DataAccess($wikiApiHelper, $wikiSiteConfig, []);
-        $wikiPageConfig = new PageConfig($wikiApiHelper, [
-            'title' => $subject,
-            'pageLanguage' => $lang,
-            'pageLanguageDir' => 'ltr',
-            'pageContent' => $wikiData,
-        ]);
-        $wikiParsoid = new Parsoid($wikiSiteConfig, $wikiDataAccess);
-
-        /** @var PageBundle $pageBundle */
-        $pageBundle = $wikiParsoid->wikitext2html($wikiPageConfig, [
-            'wrapSections' => true,
-            'pageBundle' => true,
-            'body_only' => true,
-            'outputContentVersion' => null,
-            'contentmodel' => null,
-            'discardDataParsoid' => true,
-            'logLinterData' => true,
-        ]);
-
-        return $pageBundle->toHtml();
     }
 
     /**
