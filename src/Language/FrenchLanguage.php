@@ -103,7 +103,7 @@ class FrenchLanguage implements LanguageInterface
      */
     public function uselessBlockSelectors(): array
     {
-        return ['.bandeau-portail', '.bandeau-container'];
+        return ['.bandeau-portail', '.bandeau-container', '.API'];
     }
 
     /**

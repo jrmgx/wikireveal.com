@@ -93,8 +93,7 @@ class EnglishLanguage implements LanguageInterface
      */
     public function uselessBlockSelectors(): array
     {
-        // return ['.metadata.ambox', '.ombox.ombox-notice', '.hatnote.navigation-not-searchable'];
-        return ['.metadata', '.ombox-notice', '.hatnote'];
+        return ['.metadata', '.ombox-notice', '.hatnote', '.IPA'];
     }
 
     /**
