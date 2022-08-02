@@ -44,6 +44,7 @@ class EnglishLanguage implements LanguageInterface
     public function variations(string $normalized): array
     {
         return array_merge(
+            [$normalized],
             $this->englishInflector->singularize($normalized),
             $this->englishInflector->pluralize($normalized)
         );

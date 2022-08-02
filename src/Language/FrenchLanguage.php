@@ -51,6 +51,7 @@ class FrenchLanguage implements LanguageInterface
     public function variations(string $normalized): array
     {
         return array_merge(
+            [$normalized],
             $this->frenchInflector->singularize($normalized),
             $this->frenchInflector->pluralize($normalized)
         );

@@ -6,7 +6,7 @@
 parameters:
     # This has to be incremented when a new asset is incompatible with the previous version
     asset_version_major: 'assets/2'
-    asset_version_minor: 2
+    asset_version_minor: 3
     domain: 'https://wikireveal.com'
 
 services:

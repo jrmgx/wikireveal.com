@@ -45,6 +45,7 @@ class IndexController extends AbstractController
     #[Route(path: '/{_locale}')]
     public function wikireveal(Request $request, string $assetVersion = 'assets'): Response
     {
+        $debug = false;
         $lang = $request->getLocale();
         $dateInt = (int) (new DateTimeImmutable())->format('Ymd');
         $puzzleId = $lang.'-'.$dateInt;
@@ -56,7 +57,7 @@ class IndexController extends AbstractController
             $article = $articles[$dateInt % \count($articles)];
         } catch (Exception) {
             throw $this->createNotFoundException('This language is not available yet.');
-            // TODO link to github explain how to build one
+            // TODO link to github explain how to add one
         }
 
         $pageHtml = $this->cache('pageHtml-'.$puzzleId.'.json', fn () => $this->getPageHtml($article, $lang));
@@ -96,13 +97,17 @@ class IndexController extends AbstractController
                 $outputs[] = '<span class="wz-w-ponctuation-'.$ponctuationSize.'">'.$token.'</span>';
             } else {
                 $normalized = $language->normalize($token);
-                $hashes = implode('|', array_map($this->getHash(...), $language->variations($normalized)));
                 $size = $this->getSize($token);
                 $encoded = $this->getEncoded($token);
                 $placeholder = $this->getPlaceholder($size);
-                $outputs[] = '<span data-hash="'.$hashes.'" class="wz-w-hide" data-size="'.$size.'" data-word="'.$encoded.'">'.$placeholder.'</span>';
-                // For debug
-                // $outputs[] = '<span data-hash="'.$hash.'" class="wz-w-hide" data-size="'.$size.'" data-word="'.$encoded.'">'.$token.'</span>';
+                /* @phpstan-ignore-next-line */
+                if ($debug) {
+                    $hashes = implode('|', $language->variations($normalized));
+                    $outputs[] = '<span data-hash="'.$hashes.'" class="wz-w-hide" data-size="'.$size.'" data-word="'.$encoded.'">'.$token.'</span>';
+                } else {
+                    $hashes = implode('|', array_map($this->getHash(...), $language->variations($normalized)));
+                    $outputs[] = '<span data-hash="'.$hashes.'" class="wz-w-hide" data-size="'.$size.'" data-word="'.$encoded.'">'.$placeholder.'</span>';
+                }
             }
         }
 
