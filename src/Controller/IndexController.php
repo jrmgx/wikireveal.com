@@ -68,6 +68,7 @@ class IndexController extends AbstractController
         // To win the player has to find all the meaningful words of the subject,
         // so we are filtering the others.
         $subject = $this->decodeSubject($article);
+        $encodedSubject = $this->getEncoded($subject);
         $winTokens = $this->tokenize($subject);
         // Remove one-letter and non-alphabetical tokens: https://regex101.com/r/jVVLjx/1
         $winTokens = array_filter($winTokens, fn (string $e) => !preg_match('/^(.|[^a-z]+?)$/misu', $e));
@@ -113,6 +114,7 @@ class IndexController extends AbstractController
             'lang' => $lang,
             'outputs' => $outputs,
             'puzzle_id' => $puzzleId,
+            'encoded_subject' => $encodedSubject,
             'common_words' => $language->commonWords(),
             'win_hashes' => $winTokens,
             'ui_messages' => [
