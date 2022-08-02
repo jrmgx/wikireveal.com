@@ -234,6 +234,13 @@ form #wz-action-send {
     text-transform: capitalize;
 }
 
+/* Archives */
+.wz-secret {
+    background: #2F2F2F;
+    color: #2F2F2F;
+    cursor: help;
+}
+
 @media (prefers-color-scheme: dark) {
     html, body {
         color: white;

@@ -6,8 +6,10 @@
 parameters:
     # This has to be incremented when a new asset is incompatible with the previous version
     asset_version_major: 'assets/2'
-    asset_version_minor: 3
+    asset_version_minor: 4
     domain: 'https://wikireveal.com'
+    assets_directory: '%kernel.project_dir%/public/assets'
+    docs_directory: '%kernel.project_dir%/docs'
 
 services:
     _instanceof:
@@ -29,9 +31,12 @@ services:
 
     App\Controller\IndexController:
         arguments:
+            $docsDirectory: '%docs_directory%'
             $languageProvider: !tagged_locator { tag: 'language', index_by: 'key', default_index_method: 'lang' }
 
     App\Command\BuildCommand:
         arguments:
+            $assetsDirectorySource: '%assets_directory%'
+            $docsDirectoryDestination: '%docs_directory%'
             $assetVersion: '%asset_version_major%'
             $languageProvider: !tagged_locator { tag: 'language', index_by: 'key', default_index_method: 'lang' }

@@ -26,6 +26,8 @@ class BuildCommand extends Command
         private readonly ServiceProviderInterface $languageProvider,
         private readonly LocaleSwitcher $localeSwitcher,
         private readonly string $assetVersion,
+        private readonly string $docsDirectoryDestination,
+        private readonly string $assetsDirectorySource,
     ) {
         parent::__construct();
     }
@@ -33,20 +35,19 @@ class BuildCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        $docsDirectoryDestination = __DIR__.'/../../docs';
-        $assetDirectorySource = __DIR__.'/../../public/assets';
+
         $date = (new DateTimeImmutable())->format('Ymd');
         $filesystem = new Filesystem();
 
-        if (!$filesystem->exists($docsDirectoryDestination)) {
+        if (!$filesystem->exists($this->docsDirectoryDestination)) {
             $io->error('/docs directory does not exist.');
 
             return Command::FAILURE;
         }
 
         // Assets
-        $assets = (new Finder())->in($assetDirectorySource);
-        $assetDirectoryDestination = $docsDirectoryDestination.'/'.$this->assetVersion;
+        $assets = (new Finder())->in($this->assetsDirectorySource);
+        $assetDirectoryDestination = $this->docsDirectoryDestination.'/'.$this->assetVersion;
         $filesystem->mkdir($assetDirectoryDestination);
         foreach ($assets as $asset) {
             $io->info('Copying '.$asset->getFilename());
@@ -65,9 +66,12 @@ class BuildCommand extends Command
 
             return Command::FAILURE;
         }
-        file_put_contents($docsDirectoryDestination.'/index.html', $response->getContent());
+        file_put_contents(
+            $this->docsDirectoryDestination.'/index.html',
+            $response->getContent()
+        );
 
-        // Puzzle of the day for each lang
+        // Puzzle of the day + archive for each lang
         foreach ($this->languageProvider->getProvidedServices() as $lang => $class) {
             $io->info('Generating puzzle for '.$lang.' ...');
 
@@ -84,11 +88,34 @@ class BuildCommand extends Command
             }
 
             $filesystem->mkdir([
-                $docsDirectoryDestination.'/'.$lang,
-                $docsDirectoryDestination.'/'.$lang.'/'.$date,
+                $this->docsDirectoryDestination.'/'.$lang,
+                $this->docsDirectoryDestination.'/'.$lang.'/'.$date,
             ]);
-            file_put_contents($docsDirectoryDestination.'/'.$lang.'/index.html', $response->getContent());
-            file_put_contents($docsDirectoryDestination.'/'.$lang.'/'.$date.'/index.html', $response->getContent());
+            file_put_contents(
+                $this->docsDirectoryDestination.'/'.$lang.'/index.html',
+                $response->getContent()
+            );
+            file_put_contents(
+                $this->docsDirectoryDestination.'/'.$lang.'/'.$date.'/index.html',
+                $response->getContent()
+            );
+
+            $io->info('Generating archive for '.$lang.' ...');
+
+            $response = $this->indexController->archive($request, $this->assetVersion);
+            if (200 !== $response->getStatusCode()) {
+                $io->error('Something went wrong.');
+
+                return Command::FAILURE;
+            }
+
+            $filesystem->mkdir([
+                $this->docsDirectoryDestination.'/'.$lang.'/archive',
+            ]);
+            file_put_contents(
+                $this->docsDirectoryDestination.'/'.$lang.'/archive/index.html',
+                $response->getContent()
+            );
         }
 
         return Command::SUCCESS;
