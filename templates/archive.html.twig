@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+    <section class="wz-section">
+        <h1>
+            {{ 'main.title'|trans }}
+            <small>{{ 'main.sub_title'|trans }}</small>
+        </h1>
+        <div>
+            <cite>
+                {{ 'main.description'|trans }}<br>
+                {{ 'main.frequency'|trans }}
+            </cite>
+        </div>
+        <div>
+            <h2>{{ 'archives.title'|trans }}</h2>
+            <p>{{ 'archives.click_to_see'|trans }}</p>
+            <ul>
+                {% for archive in archives %}
+                    <li>
+                        <a href="{{ archive.url }}">{{ archive.date }}</a>
+                        –
+                        {{ 'archives.subject'|trans }}
+                        <span class="wz-secret">{{ archive.subject }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </section>
+    <script>
+      (function () {
+        document.querySelectorAll('.wz-secret').forEach((element) => {
+          element.addEventListener('click', (event) => {
+            event.preventDefault();
+            event.target.classList.remove('wz-secret');
+          });
+        });
+      })();
+    </script>
+{% endblock %}

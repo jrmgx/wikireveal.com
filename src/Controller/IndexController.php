@@ -10,9 +10,11 @@ use HTMLPurifier_Config;
 use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\Service\ServiceProviderInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -23,6 +25,8 @@ class IndexController extends AbstractController
         private readonly HttpClientInterface $httpClient,
         private readonly TranslatorInterface $translator,
         private readonly ServiceProviderInterface $languageProvider,
+        private readonly RouterInterface $router,
+        private readonly string $docsDirectory,
     ) {
     }
 
@@ -39,6 +43,45 @@ class IndexController extends AbstractController
         return $this->render('index.html.twig', [
             'asset_version_major' => $assetVersion,
             'languages' => $langages,
+        ]);
+    }
+
+    #[Route('/{_locale}/archive')]
+    public function archive(Request $request, string $assetVersion = 'assets'): Response
+    {
+        $archives = [];
+        $lang = $request->getLocale();
+        $date = (new DateTimeImmutable())->format('Ymd');
+
+        $gamesDirectories = (new Finder())->in($this->docsDirectory.'/'.$lang)->directories();
+        foreach ($gamesDirectories as $gameDirectory) {
+            $gameDate = $gameDirectory->getFilename();
+            $dateTime = \DateTime::createFromFormat('Ymd', $gameDate);
+            if (false === $dateTime) {
+                continue;
+            }
+
+            if ($gameDate === $date) {
+                continue; // Today's puzzle
+            }
+
+            $indexFile = $gameDirectory->getRealPath().'/index.html';
+            if (!file_exists($indexFile)) {
+                continue;
+            }
+
+            $head = $this->headOfFile($indexFile, 30);
+            $subject = $this->findSubject($head) ?? $this->translator->trans('archives.unknown');
+            $archives[] = [
+                'url' => $this->router->generate('app_index_wikireveal', ['_locale' => $lang]).'/'.$gameDate,
+                'subject' => $subject,
+                'date' => $dateTime->format('Y-m-d'),
+            ];
+        }
+
+        return $this->render('archive.html.twig', [
+            'asset_version_major' => $assetVersion,
+            'archives' => $archives,
         ]);
     }
 
@@ -68,6 +111,7 @@ class IndexController extends AbstractController
         // To win the player has to find all the meaningful words of the subject,
         // so we are filtering the others.
         $subject = $this->decodeSubject($article);
+        $encodedSubject = $this->getEncoded($subject);
         $winTokens = $this->tokenize($subject);
         // Remove one-letter and non-alphabetical tokens: https://regex101.com/r/jVVLjx/1
         $winTokens = array_filter($winTokens, fn (string $e) => !preg_match('/^(.|[^a-z]+?)$/misu', $e));
@@ -113,6 +157,7 @@ class IndexController extends AbstractController
             'lang' => $lang,
             'outputs' => $outputs,
             'puzzle_id' => $puzzleId,
+            'encoded_subject' => $encodedSubject,
             'common_words' => $language->commonWords(),
             'win_hashes' => $winTokens,
             'ui_messages' => [
@@ -325,5 +370,39 @@ class IndexController extends AbstractController
         }
 
         return $data;
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function headOfFile(string $file, int $lines): array
+    {
+        $handle = fopen($file, 'r+');
+        if (false === $handle) {
+            return [];
+        }
+
+        $contents = [];
+        $i = 0;
+        while (!feof($handle) && $i < $lines) {
+            $contents[] = (string) fread($handle, 8192);
+        }
+        fclose($handle);
+
+        return $contents;
+    }
+
+    /**
+     * @param array<string> $lines
+     */
+    private function findSubject(array $lines): ?string
+    {
+        foreach ($lines as $line) {
+            if (preg_match('/<meta name="subject" content="(.*?)">/misu', $line, $matches)) {
+                return trim(urldecode((string) base64_decode($matches[1], true)));
+            }
+        }
+
+        return null;
     }
 }
