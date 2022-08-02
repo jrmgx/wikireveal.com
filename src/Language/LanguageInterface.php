@@ -34,11 +34,13 @@ interface LanguageInterface
 
     /**
      * Return the size needed for this ponctuation sign, false for not a ponctuation sign.
+     * This is linked to the CSS classes `.wz-w-ponctuation-xxx`.
      * ie: in French:
-     *  - ":" needs a space before and after so it's 2
-     *  - "," only needs a space after, so it's 1
-     *  - "-" needs no spacing at all, so it's 0
-     *  - "«" needs a space before, so it's -1.
+     *  - ":" needs a space before and after so it's 2 (=> .wz-w-ponctuation-2)
+     *  - "," only needs a space after, so it's 1 (=> .wz-w-ponctuation-1)
+     *  - "-" needs no spacing at all, so it's 0 (=> .wz-w-ponctuation-0)
+     *  - "«" needs a space before, so it's -1 (=> .wz-w-ponctuation--1)
+     *  - "c'" needs a space before and is two character long, so it's -12 (=> .wz-w-ponctuation--12).
      */
     public function isPonctuation(string $normalized): int|false;
 

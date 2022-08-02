@@ -72,7 +72,6 @@ class IndexController extends AbstractController
         // Remove one-letter and non-alphabetical tokens: https://regex101.com/r/jVVLjx/1
         $winTokens = array_filter($winTokens, fn (string $e) => !preg_match('/^(.|[^a-z]+?)$/misu', $e));
         $winTokens = array_filter($winTokens, fn (string $e) => false === $language->isPonctuation($e));
-        $winTokens = array_filter($winTokens, fn (string $e) => !$this->hasQuote($e));
         $winTokens = array_map($language->normalize(...), $winTokens);
         $winTokens = array_map($this->getHash(...), $winTokens);
         $winTokens = array_values($winTokens);
@@ -91,8 +90,6 @@ class IndexController extends AbstractController
         foreach ($tokens as $token) {
             if ($this->isHtmlMarkup($token)) {
                 $outputs[] = $token;
-            } elseif ($this->hasQuote($token)) {
-                $outputs[] = '<span class="wz-w-ponctuation-quote">'.$token.'</span>';
             } elseif (($ponctuationSize = $language->isPonctuation($token)) !== false) {
                 $outputs[] = '<span class="wz-w-ponctuation-'.$ponctuationSize.'">'.$token.'</span>';
             } else {
@@ -131,11 +128,6 @@ class IndexController extends AbstractController
     private function isHtmlMarkup(string $candidate): bool
     {
         return str_starts_with($candidate, '<');
-    }
-
-    private function hasQuote(string $candidate): bool
-    {
-        return (bool) preg_match('/[’\']/miu', $candidate);
     }
 
     private function getPlaceholder(int $size): string
@@ -290,7 +282,8 @@ class IndexController extends AbstractController
     {
         $prepareHtml = str_replace("\n", ' ', $html);
         // Trick to keep quotes around (otherwise they are considered as word boundaries and got removed later)
-        $prepareHtml = str_replace(["'", '’'], '__QUOTE__ ', $prepareHtml);
+        // https://regex101.com/r/9d0ofu/3
+        $prepareHtml = preg_replace('/(\b\w)[\'’]|[\'’](\w\b)/miu', ' $1__QUOTE__$2 ', $prepareHtml);
         // https://regex101.com/r/fedzhl/1
         $prepareHtml = preg_replace('/(<.*?>|\b|\(|\)|\.|;|-|,)/misu', "\n$1\n", $prepareHtml);
         $prepareHtml = str_replace('__QUOTE__', "'", $prepareHtml);
