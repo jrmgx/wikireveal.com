@@ -23,7 +23,7 @@ class EnglishLanguage implements LanguageInterface
 
     public function langName(): string
     {
-        return 'English (beta)';
+        return 'English';
     }
 
     public function normalize(string $word): string
