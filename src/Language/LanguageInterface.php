@@ -63,7 +63,7 @@ interface LanguageInterface
     /**
      * Return a list of wikipedia page url to pick for.
      *
-     * ie: for french the list can be built by navigating to https://fr.wikipedia.org/wiki/Wikip%C3%A9dia:Articles_vitaux/Niveau_4
+     * ie: for french the list can be built by navigating to https://en.wikipedia.org/wiki/Wikipedia:Vital_articles/Level/4
      * then in each Section taking articles that are grade B or more.
      *
      * This piece of javascript will help to get a raw list (execute this on a javascript console on a wikipedia page):
