@@ -1,0 +1,40 @@
+# Contribution by reddit user GiveMeKarmaAndSTFU
+# https://www.reddit.com/r/Redactle/comments/wg2yma/comment/iixykiv/
+
+header:
+    title: "WikiReveal: encuentra el artículo de la Wikipedia detrás de las palabras censuradas."
+    description: "WikiReveal es un juego diario de navegador en el que el jugador tiene que descubrir el tema de un artículo aleatorio de la Wikipedia cuyas palabras han sido censuradas. Cada día se publica un puzzle nuevo a las 3 de la mañana (UTC, hora universal)."
+
+main:
+    title: WikiReveal
+    sub_title: Encuentra el artículo de la Wikipedia detrás de las palabras censuradas.
+    description: "WikiReveal es un juego diario de navegador en el que el jugador tiene que descubrir el tema de un artículo aleatorio de la Wikipedia cuyas palabras han sido censuradas."
+    frequency: "Cada día se publica un puzzle nuevo a las 3 de la mañana (UTC, hora universal)."
+
+archives:
+    title: Historial
+    click_to_see: Pincha aquí para mostrar el tema de ese día.
+    subject: "Tema:"
+    unknown: "Desconocido"
+
+ui:
+    note: ""
+    placeholder:
+        guess: "Palabra"
+    action:
+        send: "Intentos"
+        share: "Comparte tu resultado"
+        top: "⬆︎"
+
+message:
+    victory: "¡Enhorabuena, has ganado!"
+    share_public: >-
+        He encontrado la palabra secreta de WikiReveal de hoy en {count, plural, 
+            =0 {cero intentos} 
+            one {un intento} 
+            other {# intentos} 
+        }. ¿Y tú?
+
+error:
+    already_sent: "Ya probado"
+    share_error: "¡Copia/pega este texto para compartir tu resultado!"
