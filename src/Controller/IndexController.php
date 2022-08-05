@@ -209,7 +209,7 @@ class IndexController extends AbstractController
         $response = $this->httpClient->request(
             'GET',
             "https://$lang.wikipedia.org/w/api.php".
-            "?action=parse&format=json&page=$subject&prop=text&formatversion=2"
+            "?action=parse&format=json&page=$subject&prop=text&formatversion=2&redirects"
         );
         $content = $response->getContent();
 
