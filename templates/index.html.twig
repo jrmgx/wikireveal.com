@@ -16,7 +16,10 @@
             <h2>Available languages</h2>
             <ul>
                 {% for lang, language in languages %}
-                <li><a href="{{ path('app_index_wikireveal', {'_locale': lang}) }}">{{ language }}</a></li>
+                <li>
+                    <a href="{{ path('app_index_wikireveal', {'_locale': lang}) }}">{{ language }}</a>
+                    <small>(<a href="{{ path('app_index_archive', {'_locale': lang}) }}">{{ 'archives.title'|trans(locale=lang)|lower }}</a>)</small>
+                </li>
                 {% endfor %}
                 <li><a href="https://github.com/jrmgx/wikireveal.com">Add your language by contributing</a></li>
             </ul>

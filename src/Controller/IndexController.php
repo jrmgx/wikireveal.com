@@ -52,8 +52,10 @@ class IndexController extends AbstractController
         $archives = [];
         $lang = $request->getLocale();
         $date = (new DateTimeImmutable())->format('Ymd');
+        $finder = (new Finder())->in($this->docsDirectory.'/'.$lang);
 
-        $gamesDirectories = (new Finder())->in($this->docsDirectory.'/'.$lang)->directories();
+        $gamesDirectories = iterator_to_array($finder->directories());
+        rsort($gamesDirectories);
         foreach ($gamesDirectories as $gameDirectory) {
             $gameDate = $gameDirectory->getFilename();
             $dateTime = \DateTime::createFromFormat('Ymd', $gameDate);
