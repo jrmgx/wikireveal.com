@@ -250,6 +250,7 @@ class IndexController extends AbstractController
             // Common HTML selector
             if (
                 $crawler->matches('table') ||
+                $crawler->matches('pre') ||
                 $crawler->matches('link') ||
                 $crawler->matches('.navbar') ||
                 $crawler->matches('.infobox_v3') ||
@@ -327,7 +328,7 @@ class IndexController extends AbstractController
      */
     private function tokenize(string $html): array
     {
-        $prepareHtml = str_replace("\n", ' ', $html);
+        $prepareHtml = str_replace(["\n", '&nbsp;'], ' ', $html);
         // Trick to keep quotes around (otherwise they are considered as word boundaries and got removed later)
         // https://regex101.com/r/9d0ofu/3
         $prepareHtml = preg_replace('/(\b\w)[\'’]|[\'’](\w\b)/miu', ' $1__QUOTE__$2 ', $prepareHtml);

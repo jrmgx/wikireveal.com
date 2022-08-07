@@ -122,7 +122,7 @@ class FrenchLanguage implements LanguageInterface
      */
     public function endSelectors(): array
     {
-        return ['#Annexes', '#Voir_aussi', '#Notes_et_références'];
+        return ['#Annexes', '#Voir_aussi', '#Notes_et_références', '#Galerie'];
     }
 
     /**

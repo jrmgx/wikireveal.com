@@ -6,7 +6,7 @@ A multilingual version of redactle.com published at [wikireveal.com](https://wik
 
 This version is focused on user contributions & open source with a focus on implementing multiples languages by letting anyone contribute easily.
 
-## Technicals Stack
+## Technical Stack
 
 This app/website uses PHP and Symfony as well as some vanilla Javascript. It aims to be the simplest stack possible, so anyone could contribute.
 
