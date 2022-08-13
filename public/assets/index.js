@@ -26,6 +26,12 @@
   const textElement = document.querySelector('.wz-text');
 
   /**
+   * @param id {string} lang-YYYYMMDD
+   * @return {string} YYYYMMDD
+   */
+  const parsePuzzleIdDate = (id) => id.split('-')[1];
+
+  /**
    * Delegate event
    * @see from https://stackoverflow.com/a/56570910/696517
    */
@@ -335,9 +341,15 @@
     log(`Reload game state for puzzle id "${puzzleId}"`);
     savedState = JSON.parse(item);
     savedState.forEach(insertReplayWord);
-  } else {
-    log(`No game state for puzzle id "${puzzleId}", clearing previous`);
-    localStorage.clear(); // Clear all previous plays TODO is this really useful?
+  }
+
+  log('Clearing previous game states');
+  const puzzleDate = new RegExp(parsePuzzleIdDate(puzzleId));
+  for (let i = 0; i < localStorage.length; i += 1) {
+    const key = localStorage.key(i);
+    if (!puzzleDate.test(key)) {
+      localStorage.removeItem(key);
+    }
   }
 
   // Handling focus
