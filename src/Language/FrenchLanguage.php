@@ -69,40 +69,40 @@ class FrenchLanguage implements LanguageInterface
         ];
     }
 
-    public function isPonctuation(string $normalized): int|false
+    public function isPonctuation(string $token): int|false
     {
         // Quote + letter
-        if (preg_match('`\'\w`miu', $normalized)) {
+        if (preg_match('`\'\w`miu', $token)) {
             return -12;
         }
 
         // Letter + quote
-        if (preg_match('`\w\'`miu', $normalized)) {
+        if (preg_match('`\w\'`miu', $token)) {
             return 12;
         }
 
-        $ponctuationMinusOne = array_map(preg_quote(...), ['«', '«', '(']);
-        if (preg_match('`^('.implode('|', $ponctuationMinusOne).')$`misu', $normalized)) {
+        $ponctuationMinusOne = array_map(preg_quote(...), ['«', '(']);
+        if (preg_match('`^\s?('.implode('|', $ponctuationMinusOne).')\s?$`misu', $token)) {
             return -1;
         }
 
         $ponctuationZero = array_map(preg_quote(...), ['-', '–', "'", '’']);
-        if (preg_match('`^('.implode('|', $ponctuationZero).')$`misu', $normalized)) {
+        if (preg_match('`^\s?('.implode('|', $ponctuationZero).')\s?$`misu', $token)) {
             return 0;
         }
 
-        $ponctuationOne = array_map(preg_quote(...), [',', '.', ')', '»', '»']);
-        if (preg_match('`^('.implode('|', $ponctuationOne).')$`misu', $normalized)) {
+        $ponctuationOne = array_map(preg_quote(...), [',', '.', ')', '»']);
+        if (preg_match('`^\s?('.implode('|', $ponctuationOne).')\s?$`misu', $token)) {
             return 1;
         }
 
         $ponctuationTwo = array_map(preg_quote(...), [';', ':', '/']);
-        if (preg_match('`^('.implode('|', $ponctuationTwo).')$`misu', $normalized)) {
+        if (preg_match('`^\s?('.implode('|', $ponctuationTwo).')\s?$`misu', $token)) {
             return 2;
         }
 
         $multiple = array_merge($ponctuationMinusOne, $ponctuationZero, $ponctuationOne, $ponctuationTwo);
-        if (preg_match('`^('.implode('|', $multiple).')+$`misu', $normalized)) {
+        if (preg_match('`^\s?('.implode('|', $multiple).')+\s?$`misu', $token)) {
             return 2;
         }
 
@@ -122,7 +122,7 @@ class FrenchLanguage implements LanguageInterface
      */
     public function endSelectors(): array
     {
-        return ['#Annexes', '#Voir_aussi', '#Notes_et_références', '#Galerie'];
+        return ['#Annexes', '#Voir_aussi', '#Notes_et_références', '#Galerie', '#Bibliographie'];
     }
 
     /**

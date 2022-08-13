@@ -42,7 +42,7 @@ interface LanguageInterface
      *  - "«" needs a space before, so it's -1 (=> .wz-w-ponctuation--1)
      *  - "c'" needs a space before and is two character long, so it's -12 (=> .wz-w-ponctuation--12).
      */
-    public function isPonctuation(string $normalized): int|false;
+    public function isPonctuation(string $token): int|false;
 
     /**
      * Return a CSS selector list of HTML block from the wiki page that we want to remove.

@@ -69,40 +69,40 @@ class SpanishLanguage implements LanguageInterface
         ];
     }
 
-    public function isPonctuation(string $normalized): int|false
+    public function isPonctuation(string $token): int|false
     {
         // Quote + letter
-        if (preg_match('`\'\w`miu', $normalized)) {
+        if (preg_match('`\'\w`miu', $token)) {
             return -12;
         }
 
         // Letter + quote
-        if (preg_match('`\w\'`miu', $normalized)) {
+        if (preg_match('`\w\'`miu', $token)) {
             return 12;
         }
 
         $ponctuationMinusOne = array_map(preg_quote(...), ['«', '«', '(']);
-        if (preg_match('`^('.implode('|', $ponctuationMinusOne).')$`misu', $normalized)) {
+        if (preg_match('`^('.implode('|', $ponctuationMinusOne).')$`misu', $token)) {
             return -1;
         }
 
         $ponctuationZero = array_map(preg_quote(...), ['-', '–', "'", '’']);
-        if (preg_match('`^('.implode('|', $ponctuationZero).')$`misu', $normalized)) {
+        if (preg_match('`^('.implode('|', $ponctuationZero).')$`misu', $token)) {
             return 0;
         }
 
         $ponctuationOne = array_map(preg_quote(...), [',', '.', ')', '»', '»']);
-        if (preg_match('`^('.implode('|', $ponctuationOne).')$`misu', $normalized)) {
+        if (preg_match('`^('.implode('|', $ponctuationOne).')$`misu', $token)) {
             return 1;
         }
 
         $ponctuationTwo = array_map(preg_quote(...), [';', ':', '/']);
-        if (preg_match('`^('.implode('|', $ponctuationTwo).')$`misu', $normalized)) {
+        if (preg_match('`^('.implode('|', $ponctuationTwo).')$`misu', $token)) {
             return 2;
         }
 
         $multiple = array_merge($ponctuationMinusOne, $ponctuationZero, $ponctuationOne, $ponctuationTwo);
-        if (preg_match('`^('.implode('|', $multiple).')+$`misu', $normalized)) {
+        if (preg_match('`^('.implode('|', $multiple).')+$`misu', $token)) {
             return 2;
         }
 
