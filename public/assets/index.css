@@ -140,6 +140,13 @@ a.wz-share, a.wz-share:hover {
     display: inline-block;
 }
 
+.wz-w-ponctuation-1 + .wz-w-ponctuation-1 {
+    position: relative;
+    left: 0;
+    width: 1rem;
+    display: inline-block;
+}
+
 .wz-w-ponctuation-12 {
     position: relative;
     left: 0;

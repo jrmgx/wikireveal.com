@@ -72,7 +72,7 @@ class IndexController extends AbstractController
                 continue;
             }
 
-            $head = $this->headOfFile($indexFile, 30);
+            $head = $this->headOfFile($indexFile);
             $subject = $this->findSubject($head) ?? $this->translator->trans('archives.unknown');
             $archives[] = [
                 'url' => $this->router->generate('app_index_wikireveal', ['_locale' => $lang]).'/'.$gameDate,
@@ -102,7 +102,6 @@ class IndexController extends AbstractController
             $article = $articles[$dateInt % \count($articles)];
         } catch (Exception) {
             throw $this->createNotFoundException('This language is not available yet.');
-            // TODO link to github explain how to add one
         }
 
         $pageHtml = $this->cache('pageHtml-'.$puzzleId.'.json', fn () => $this->getPageHtml($article, $lang));
@@ -258,6 +257,7 @@ class IndexController extends AbstractController
                 $crawler->matches('.reference') ||
                 $crawler->matches('.noprint') ||
                 $crawler->matches('.toc') ||
+                $crawler->matches('.need_ref_tag') ||
                 $crawler->matches('.mw-editsection') ||
                 $crawler->matches('.thumb.tright') ||
                 $crawler->matches('a[href$="\.ogg"]') ||
@@ -329,6 +329,7 @@ class IndexController extends AbstractController
     private function tokenize(string $html): array
     {
         $prepareHtml = str_replace(["\n", '&nbsp;'], ' ', $html);
+        $prepareHtml = preg_replace('/\s+/miu', ' ', $prepareHtml);
         // Trick to keep quotes around (otherwise they are considered as word boundaries and got removed later)
         // https://regex101.com/r/9d0ofu/3
         $prepareHtml = preg_replace('/(\b\w)[\'’]|[\'’](\w\b)/miu', ' $1__QUOTE__$2 ', $prepareHtml);
@@ -378,7 +379,7 @@ class IndexController extends AbstractController
     /**
      * @return array<int, string>
      */
-    private function headOfFile(string $file, int $lines): array
+    private function headOfFile(string $file): array
     {
         $handle = fopen($file, 'r+');
         if (false === $handle) {
@@ -387,7 +388,7 @@ class IndexController extends AbstractController
 
         $contents = [];
         $i = 0;
-        while (!feof($handle) && $i < $lines) {
+        while (!feof($handle) && $i++ < 30) {
             $contents[] = (string) fread($handle, 8192);
         }
         fclose($handle);
