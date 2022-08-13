@@ -17,6 +17,7 @@
   let wantFocusBack = null;
 
   // DOM
+  const uiPanelElement = document.querySelector('.wz-ui');
   const guessInput = document.getElementById('wz-input-guess');
   const sendAction = document.getElementById('wz-action-send');
   const scrollTopAction = document.querySelector('.wz-top');
@@ -96,6 +97,8 @@
       'afterbegin',
       `<div data-highlight="${hash}"><span class="wz-tries">#${tries}</span><span class="wz-word">${word}</span><span>${count}</span></div>`,
     );
+    // Scroll list to top
+    uiPanelElement.scrollTop = 0;
   };
 
   /**
