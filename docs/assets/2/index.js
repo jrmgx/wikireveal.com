@@ -17,6 +17,7 @@
   let wantFocusBack = null;
 
   // DOM
+  const uiPanelElement = document.querySelector('.wz-ui');
   const guessInput = document.getElementById('wz-input-guess');
   const sendAction = document.getElementById('wz-action-send');
   const scrollTopAction = document.querySelector('.wz-top');
@@ -24,6 +25,12 @@
   const listTriesElement = document.getElementById('wz-list-tries');
   const messageSendElement = document.getElementById('wz-message-send');
   const textElement = document.querySelector('.wz-text');
+
+  /**
+   * @param id {string} lang-YYYYMMDD
+   * @return {string} YYYYMMDD
+   */
+  const parsePuzzleIdDate = (id) => id.split('-')[1];
 
   /**
    * Delegate event
@@ -90,6 +97,8 @@
       'afterbegin',
       `<div data-highlight="${hash}"><span class="wz-tries">#${tries}</span><span class="wz-word">${word}</span><span>${count}</span></div>`,
     );
+    // Scroll list to top
+    uiPanelElement.scrollTop = 0;
   };
 
   /**
@@ -335,9 +344,15 @@
     log(`Reload game state for puzzle id "${puzzleId}"`);
     savedState = JSON.parse(item);
     savedState.forEach(insertReplayWord);
-  } else {
-    log(`No game state for puzzle id "${puzzleId}", clearing previous`);
-    localStorage.clear(); // Clear all previous plays TODO is this really useful?
+  }
+
+  log('Clearing previous game states');
+  const puzzleDate = new RegExp(parsePuzzleIdDate(puzzleId));
+  for (let i = 0; i < localStorage.length; i += 1) {
+    const key = localStorage.key(i);
+    if (!puzzleDate.test(key)) {
+      localStorage.removeItem(key);
+    }
   }
 
   // Handling focus
