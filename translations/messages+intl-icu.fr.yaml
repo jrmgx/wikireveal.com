@@ -1,12 +1,12 @@
 header:
     title: "WikiReveal : Trouvez l'article wikipedia caché !"
-    description: "WikiReveal est un jeu journalier ou il faut trouver le sujet de la page wikipedia cachée. Un nouveau article est disponible tous les jours à 3:00 AM UTC."
+    description: "WikiReveal est un jeu journalier où il faut trouver le sujet de la page wikipedia cachée. Un nouvel article est disponible tous les jours à 3:00 AM UTC."
 
 main:
     title: WikiReveal
     sub_title: Trouvez l'article wikipedia caché !
-    description: "WikiReveal est un jeu journalier ou il faut trouver le sujet de la page wikipedia cachée."
-    frequency: "Un nouveau article est disponible tous les jours à 3:00 AM UTC."
+    description: "WikiReveal est un jeu journalier où il faut trouver le sujet de la page wikipedia cachée."
+    frequency: "Un nouvel article est disponible tous les jours à 3:00 AM UTC."
 
 archives:
     title: Archives
@@ -35,4 +35,4 @@ message:
 
 error:
     already_sent: "Mot déjà proposé"
-    share_error: "Copiez coller ce texte pour partager votre score !"
+    share_error: "Copiez-collez ce texte pour partager votre score !"
