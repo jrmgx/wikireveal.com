@@ -60,7 +60,7 @@ input, button {
 .wz-section a:hover,
 a.wz-share, a.wz-share:hover {
     text-decoration: none;
-    color: #0055aa;
+    color: #55aaff;
     font-weight: bold;
 }
 
@@ -276,7 +276,7 @@ form #wz-action-send {
     }
 
     .wz-highlight-current {
-        background: #0055aa;
+        background: #55aaff;
     }
 
     #wz-message-send {
