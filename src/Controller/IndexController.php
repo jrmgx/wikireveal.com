@@ -77,7 +77,7 @@ class IndexController extends AbstractController
             $archives[] = [
                 'url' => $this->router->generate('app_index_wikireveal', ['_locale' => $lang]).'/'.$gameDate,
                 'subject' => $subject,
-                'date' => $dateTime->format('Y-m-d'),
+                'date' => $dateTime,
             ];
         }
 

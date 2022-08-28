@@ -15,13 +15,20 @@
             <h2>{{ 'archives.title'|trans }}</h2>
             <p>{{ 'archives.click_to_see'|trans }}</p>
             <ul>
+                {% set prevMonth = '' %}
                 {% for archive in archives %}
-                    <li>
-                        <a href="{{ archive.url }}">{{ archive.date }}</a>
-                        –
-                        {{ 'archives.subject'|trans }}
-                        <span class="wz-secret">{{ archive.subject }}</span>
-                    </li>
+                    {% if prevMonth != archive.date|date('m') %}
+                    {% set prevMonth = archive.date|date('m') %}
+            </ul>
+            <h3>{{ archive.date|date('Y-m') }}</h3>
+            <ul>
+                {% endif %}
+                <li>
+                    <a href="{{ archive.url }}">{{ archive.date|date('Y-m-d') }}</a>
+                    –
+                    {{ 'archives.subject'|trans }}
+                    <span class="wz-secret">{{ archive.subject }}</span>
+                </li>
                 {% endfor %}
             </ul>
         </div>
