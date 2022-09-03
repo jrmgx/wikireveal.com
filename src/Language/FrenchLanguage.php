@@ -86,7 +86,7 @@ class FrenchLanguage implements LanguageInterface
             return -1;
         }
 
-        $ponctuationZero = array_map(preg_quote(...), ['-', '–', "'", '’']);
+        $ponctuationZero = array_map(preg_quote(...), ['-', '–', "'", '’', '—']);
         if (preg_match('`^\s?('.implode('|', $ponctuationZero).')\s?$`misu', $token)) {
             return 0;
         }
@@ -96,7 +96,7 @@ class FrenchLanguage implements LanguageInterface
             return 1;
         }
 
-        $ponctuationTwo = array_map(preg_quote(...), [';', ':', '/']);
+        $ponctuationTwo = array_map(preg_quote(...), [';', ':', '/', '"']);
         if (preg_match('`^\s?('.implode('|', $ponctuationTwo).')\s?$`misu', $token)) {
             return 2;
         }
