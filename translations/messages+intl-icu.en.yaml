@@ -22,6 +22,7 @@ ui:
         send: "Guess"
         share: "Share your score"
         top: "⬆︎"
+        autoscroll: "Auto-scroll to word when found"
 
 message:
     victory: "Congratulation you won!"

@@ -23,6 +23,7 @@ ui:
         send: "Essayer"
         share: "Partager votre score"
         top: "⬆︎"
+        autoscroll: "Défiler automatiquement jusqu'au mot trouvé"
 
 message:
     victory: "Bravo vous avez trouvé !"

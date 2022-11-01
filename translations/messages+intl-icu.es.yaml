@@ -25,6 +25,7 @@ ui:
         send: "Intentos"
         share: "Comparte tu resultado"
         top: "⬆︎"
+        autoscroll: "Desplazamiento automático hasta la palabra encontrada"
 
 message:
     victory: "¡Enhorabuena, has ganado!"
