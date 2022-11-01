@@ -3,16 +3,15 @@
 namespace App\Language;
 
 use Symfony\Component\String\Inflector\EnglishInflector;
-use Transliterator;
 
 class EnglishLanguage implements LanguageInterface
 {
-    private Transliterator $transliterator;
+    private \Transliterator $transliterator;
     private EnglishInflector $englishInflector;
 
     public function __construct()
     {
-        $this->transliterator = Transliterator::create('Any-Latin; Latin-ASCII; [\u0100-\u7fff] remove');
+        $this->transliterator = \Transliterator::create('Any-Latin; Latin-ASCII; [\u0100-\u7fff] remove');
         $this->englishInflector = new EnglishInflector();
     }
 

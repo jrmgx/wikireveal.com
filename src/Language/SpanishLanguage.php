@@ -6,11 +6,10 @@ use Doctrine\Inflector\CachedWordInflector;
 use Doctrine\Inflector\Inflector;
 use Doctrine\Inflector\Rules\Spanish\Rules as Spanish;
 use Doctrine\Inflector\RulesetInflector;
-use Transliterator;
 
 class SpanishLanguage implements LanguageInterface
 {
-    private Transliterator $transliterator;
+    private \Transliterator $transliterator;
     private Inflector $spanishInflector;
 
     /**
@@ -18,7 +17,7 @@ class SpanishLanguage implements LanguageInterface
      */
     public function __construct()
     {
-        $this->transliterator = Transliterator::create('Any-Latin; Latin-ASCII; [\u0100-\u7fff] remove');
+        $this->transliterator = \Transliterator::create('Any-Latin; Latin-ASCII; [\u0100-\u7fff] remove');
         $this->spanishInflector = new Inflector(
             new CachedWordInflector(new RulesetInflector(Spanish::getSingularRuleset())),
             new CachedWordInflector(new RulesetInflector(Spanish::getPluralRuleset()))

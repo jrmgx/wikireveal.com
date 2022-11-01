@@ -3,11 +3,8 @@
 namespace App\Controller;
 
 use App\Language\LanguageInterface;
-use DateTimeImmutable;
 use Exception;
 use HTMLPurifier;
-use HTMLPurifier_Config;
-use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Finder\Finder;
@@ -21,6 +18,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class IndexController extends AbstractController
 {
+    /**
+     * @param ServiceProviderInterface<LanguageInterface> $languageProvider
+     */
     public function __construct(
         private readonly HttpClientInterface $httpClient,
         private readonly TranslatorInterface $translator,
@@ -51,7 +51,7 @@ class IndexController extends AbstractController
     {
         $archives = [];
         $lang = $request->getLocale();
-        $date = (new DateTimeImmutable())->format('Ymd');
+        $date = (new \DateTimeImmutable())->format('Ymd');
         $finder = (new Finder())->in($this->docsDirectory.'/'.$lang);
 
         $gamesDirectories = iterator_to_array($finder->directories());
@@ -92,7 +92,7 @@ class IndexController extends AbstractController
     {
         $debug = false;
         $lang = $request->getLocale();
-        $dateInt = (int) (new DateTimeImmutable())->format('Ymd');
+        $dateInt = (int) (new \DateTimeImmutable())->format('Ymd');
         $puzzleId = $lang.'-'.$dateInt;
 
         try {
@@ -106,7 +106,7 @@ class IndexController extends AbstractController
 
         $pageHtml = $this->cache('pageHtml-'.$puzzleId.'.json', fn () => $this->getPageHtml($article, $lang));
         if (!isset($pageHtml['parse']['text'])) {
-            throw new RuntimeException('Malformed JSON Content.');
+            throw new \RuntimeException('Malformed JSON Content.');
         }
 
         // To win the player has to find all the meaningful words of the subject,
@@ -300,7 +300,7 @@ class IndexController extends AbstractController
      */
     private function cleanupMarkup(string $html): string
     {
-        $HTMLPurifierConfig = HTMLPurifier_Config::createDefault();
+        $HTMLPurifierConfig = \HTMLPurifier_Config::createDefault();
         // $HTMLPurifierConfig->set('URI.DisableExternalResources', true);
         // $HTMLPurifierConfig->set('URI.DisableResources', true);
         $HTMLPurifierConfig->set('HTML.Allowed', 'h1,h2,h3,h4,h5,section,p,i');
@@ -313,7 +313,7 @@ class IndexController extends AbstractController
             'Common', // attribute collection
             [] // attributes
         );
-        $HTMLPurifier = new HTMLPurifier($HTMLPurifierConfig);
+        $HTMLPurifier = new \HTMLPurifier($HTMLPurifierConfig);
 
         return $HTMLPurifier->purify($html);
     }
@@ -355,7 +355,7 @@ class IndexController extends AbstractController
         if (file_exists($file)) {
             $data = file_get_contents($file);
             if (false === $data) {
-                throw new RuntimeException('Error while getting cache from '.$file);
+                throw new \RuntimeException('Error while getting cache from '.$file);
             }
 
             if ('json' === $ext) {

@@ -3,7 +3,7 @@
 namespace App\Command;
 
 use App\Controller\IndexController;
-use DateTimeImmutable;
+use App\Language\LanguageInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -21,8 +21,11 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
 )]
 class BuildCommand extends Command
 {
+    /**
+     * @param ServiceProviderInterface<LanguageInterface> $languageProvider
+     */
     public function __construct(
-        readonly private IndexController $indexController,
+        private readonly IndexController $indexController,
         private readonly ServiceProviderInterface $languageProvider,
         private readonly LocaleSwitcher $localeSwitcher,
         private readonly string $assetVersion,
@@ -36,7 +39,7 @@ class BuildCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        $date = (new DateTimeImmutable())->format('Ymd');
+        $date = (new \DateTimeImmutable())->format('Ymd');
         $filesystem = new Filesystem();
 
         if (!$filesystem->exists($this->docsDirectoryDestination)) {
