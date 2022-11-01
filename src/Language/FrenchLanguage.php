@@ -13,13 +13,13 @@ class FrenchLanguage implements LanguageInterface
      * Here we use the Transliterator to remove accents and the FrenchInflector to singularize French words.
      * And we have a __construct to initialize those for performance reason.
      */
-    private Transliterator $transliterator;
+    private \Transliterator $transliterator;
     private FrenchInflector $frenchInflector;
 
     public function __construct()
     {
         // $this->transliterator = Transliterator::create('NFD; [:Nonspacing Mark:] Remove; NFC');
-        $this->transliterator = Transliterator::create('Any-Latin; Latin-ASCII; [\u0100-\u7fff] remove');
+        $this->transliterator = \Transliterator::create('Any-Latin; Latin-ASCII; [\u0100-\u7fff] remove');
         $this->frenchInflector = new FrenchInflector();
     }
 
