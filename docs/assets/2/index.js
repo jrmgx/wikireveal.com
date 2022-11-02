@@ -15,10 +15,12 @@
   let currentHighlightedHash = '';
   let highlightedHashesIndex = 0;
   let wantFocusBack = null;
+  let autoscroll = true;
 
   // DOM
   const uiPanelElement = document.querySelector('.wz-ui');
   const guessInput = document.getElementById('wz-input-guess');
+  const autoscrollCheckbox = document.getElementById('wz-autoscroll');
   const sendAction = document.getElementById('wz-action-send');
   const scrollTopAction = document.querySelector('.wz-top');
   const sendForm = document.getElementById('wz-form-send');
@@ -147,8 +149,9 @@
   /**
    * Highlight words with the given hash
    * @param hash {string} The hash
+   * @param forceScroll {boolean} Force scroll to the first highlighted word
    */
-  const highlight = (hash) => {
+  const highlight = (hash, forceScroll) => {
     if (currentHighlightedHash.length === 0) {
       currentHighlightedHash = hash;
       highlightedHashesIndex = 0;
@@ -168,11 +171,13 @@
       element.classList.remove('wz-highlight-current');
       if (i === highlightedHashesIndex) {
         element.classList.add('wz-highlight-current');
-        element.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center',
-          inline: 'center',
-        });
+        if (forceScroll || autoscroll) {
+          element.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',
+            inline: 'center',
+          });
+        }
       }
       i += 1;
     });
@@ -293,7 +298,7 @@
     const div = e.target.parentNode;
     const thatHash = div.dataset.highlight || '';
 
-    highlight(thatHash);
+    highlight(thatHash, true);
   });
 
   on(document.querySelector('.wz-words'), 'click', 'span.wz-w-hide', (e) => {
@@ -326,6 +331,11 @@
 
   sendAction.addEventListener('click', evenListener);
   sendForm.addEventListener('submit', evenListener);
+  autoscrollCheckbox.addEventListener('change', (e) => {
+    log(`Autoscroll is now ${e.target.checked}`);
+    autoscroll = e.target.checked;
+    localStorage.setItem('autoscroll', autoscroll.toString());
+  });
   scrollTopAction.addEventListener('click', (e) => {
     e.preventDefault();
     document.querySelector('.wz-text').scrollTo({
@@ -337,12 +347,20 @@
   log(`Loading game for puzzle id "${puzzleId}" ...`);
   commonWords.forEach(insertCommonWord);
 
+  // Autoscroll state
+  const autoscrollLocalStorage = localStorage.getItem('autoscroll');
+  if (autoscrollLocalStorage !== null) {
+    log(`Restoring previous autoscroll state: "${autoscrollLocalStorage}"`);
+    autoscroll = autoscrollLocalStorage === true.toString();
+    autoscrollCheckbox.checked = autoscroll;
+  }
+
   // Reload data
-  const item = localStorage.getItem(puzzleId);
+  const puzzleLocalStorage = localStorage.getItem(puzzleId);
   let savedState = [];
-  if (item) {
+  if (puzzleLocalStorage) {
     log(`Reload game state for puzzle id "${puzzleId}"`);
-    savedState = JSON.parse(item);
+    savedState = JSON.parse(puzzleLocalStorage);
     savedState.forEach(insertReplayWord);
   }
 

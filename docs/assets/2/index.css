@@ -39,6 +39,7 @@ input, button {
 }
 
 /* Index */
+/*noinspection CssOverwrittenProperties*/
 .wz-section {
     margin: 1rem auto 3rem auto;
     width: 100%;
@@ -180,6 +181,7 @@ a.wz-share, a.wz-share:hover {
     overflow: auto;
 }
 
+/*noinspection CssOverwrittenProperties*/
 form, #wz-message-send {
     background: #EFEFEF;
     position: fixed;
@@ -190,6 +192,7 @@ form, #wz-message-send {
     width: calc(100% - 2rem);
 }
 
+/*noinspection CssOverwrittenProperties*/
 #wz-message-send {
     display: none;
     z-index: 1000;
@@ -215,6 +218,14 @@ form #wz-input-guess, form #wz-action-send {
 form #wz-input-guess {
     flex-grow: 2;
     height: 100%;
+}
+
+form #wz-autoscroll-container {
+    position: absolute;
+    top: 4.75rem;
+    left: 1.1rem;
+    zoom: 0.75;
+    display: flex;
 }
 
 form #wz-action-send {
@@ -297,12 +308,14 @@ form #wz-action-send {
 
 /* Medium devices (tablets, 768px and up) */
 @media (min-width: 768px) {
+    /*noinspection CssOverwrittenProperties*/
     form {
         width: 27%;
         width: calc(30% - 2rem);
         /* TODO continue to work on this case */
     }
 
+    /*noinspection CssOverwrittenProperties*/
     #wz-message-send {
         width: 26%;
         width: calc(30% - 3.5rem);
@@ -333,11 +346,13 @@ form #wz-action-send {
 
 /* Large devices (desktops, 992px and up) */
 @media (min-width: 992px) {
+    /*noinspection CssOverwrittenProperties*/
     form {
         width: 27%;
         width: calc(30% - 2rem);
     }
 
+    /*noinspection CssOverwrittenProperties*/
     #wz-message-send {
         width: 26%;
         width: calc(30% - 3.5rem);
