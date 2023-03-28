@@ -175,21 +175,18 @@ a.wz-share, a.wz-share:hover {
     background: #EFEFEF;
     position: fixed;
     width: 100%;
-    height: 30%;
     bottom: 0;
     z-index: 100;
-    overflow: auto;
+    display: flex;
+    flex-direction: column;
 }
 
 /*noinspection CssOverwrittenProperties*/
 form, #wz-message-send {
     background: #EFEFEF;
-    position: fixed;
     padding: 1rem;
     display: flex;
     align-content: center;
-    width: 95%;
-    width: calc(100% - 2rem);
 }
 
 /*noinspection CssOverwrittenProperties*/
@@ -217,7 +214,6 @@ form #wz-input-guess, form #wz-action-send {
 
 form #wz-input-guess {
     flex-grow: 2;
-    height: 100%;
 }
 
 form #wz-autoscroll-container {
