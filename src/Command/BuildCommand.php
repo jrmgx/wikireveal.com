@@ -74,53 +74,61 @@ class BuildCommand extends Command
             $response->getContent()
         );
 
+        // The idea is to be over resilient but still crash the CI job so the maintainer can check the log
+        $returnCode = Command::SUCCESS;
         // Puzzle of the day + archive for each lang
         foreach ($this->languageProvider->getProvidedServices() as $lang => $class) {
-            $io->info('Generating puzzle for '.$lang.' ...');
+            try {
+                $io->info('Generating puzzle for '.$lang.' ...');
 
-            $this->localeSwitcher->setLocale($lang);
+                $this->localeSwitcher->setLocale($lang);
 
-            $request = new Request();
-            $request->setLocale($lang);
+                $request = new Request();
+                $request->setLocale($lang);
 
-            $response = $this->indexController->wikireveal($request, $this->assetVersion);
-            if (200 !== $response->getStatusCode()) {
-                $io->error('Something went wrong.');
+                $response = $this->indexController->wikireveal($request, $this->assetVersion);
+                if (200 !== $response->getStatusCode()) {
+                    $io->error('Something went wrong.');
 
-                return Command::FAILURE;
+                    $returnCode = Command::FAILURE;
+                }
+
+                $filesystem->mkdir([
+                    $this->docsDirectoryDestination.'/'.$lang,
+                    $this->docsDirectoryDestination.'/'.$lang.'/'.$date,
+                ]);
+                file_put_contents(
+                    $this->docsDirectoryDestination.'/'.$lang.'/index.html',
+                    $response->getContent()
+                );
+                file_put_contents(
+                    $this->docsDirectoryDestination.'/'.$lang.'/'.$date.'/index.html',
+                    $response->getContent()
+                );
+
+                $io->info('Generating archive for '.$lang.' ...');
+
+                $response = $this->indexController->archive($request, $this->assetVersion);
+                if (200 !== $response->getStatusCode()) {
+                    $io->error('Something went wrong.');
+
+                    $returnCode = Command::FAILURE;
+                }
+
+                $filesystem->mkdir([
+                    $this->docsDirectoryDestination.'/'.$lang.'/archive',
+                ]);
+                file_put_contents(
+                    $this->docsDirectoryDestination.'/'.$lang.'/archive/index.html',
+                    $response->getContent()
+                );
+            } catch (\Exception $e) {
+                $io->error($e->getMessage());
+
+                $returnCode = Command::FAILURE;
             }
-
-            $filesystem->mkdir([
-                $this->docsDirectoryDestination.'/'.$lang,
-                $this->docsDirectoryDestination.'/'.$lang.'/'.$date,
-            ]);
-            file_put_contents(
-                $this->docsDirectoryDestination.'/'.$lang.'/index.html',
-                $response->getContent()
-            );
-            file_put_contents(
-                $this->docsDirectoryDestination.'/'.$lang.'/'.$date.'/index.html',
-                $response->getContent()
-            );
-
-            $io->info('Generating archive for '.$lang.' ...');
-
-            $response = $this->indexController->archive($request, $this->assetVersion);
-            if (200 !== $response->getStatusCode()) {
-                $io->error('Something went wrong.');
-
-                return Command::FAILURE;
-            }
-
-            $filesystem->mkdir([
-                $this->docsDirectoryDestination.'/'.$lang.'/archive',
-            ]);
-            file_put_contents(
-                $this->docsDirectoryDestination.'/'.$lang.'/archive/index.html',
-                $response->getContent()
-            );
         }
 
-        return Command::SUCCESS;
+        return $returnCode;
     }
 }
