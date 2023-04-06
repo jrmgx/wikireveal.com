@@ -7,7 +7,7 @@ use Doctrine\Inflector\Inflector;
 use Doctrine\Inflector\Rules\Spanish\Rules as Spanish;
 use Doctrine\Inflector\RulesetInflector;
 
-class SpanishLanguage // Skip for today implements LanguageInterface
+class SpanishLanguage implements LanguageInterface
 {
     private \Transliterator $transliterator;
     private Inflector $spanishInflector;
