@@ -106,7 +106,7 @@ class IndexController extends AbstractController
 
         $pageHtml = $this->cache('pageHtml-'.$puzzleId.'.json', fn () => $this->getPageHtml($article, $lang));
         if (!isset($pageHtml['parse']['text'])) {
-            throw new \RuntimeException('Malformed JSON Content.');
+            throw new \RuntimeException((string) json_encode($pageHtml['error'] ?? ['Malformed JSON Content.']));
         }
 
         // To win the player has to find all the meaningful words of the subject,
