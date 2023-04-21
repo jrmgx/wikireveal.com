@@ -4,8 +4,8 @@
     <script>
         window.commonWords = {{ common_words|json_encode|raw }};
         window.uiMessages = {{ ui_messages|json_encode|raw }};
-        window.winHashes = {{ win_hashes|json_encode|raw }};
         window.puzzleId = {{ puzzle_id|json_encode|raw }};
+        window.solutionChecker = {{ solution_checker|json_encode|raw }};
     </script>
     <div class="wz-container">
         <div class="wz-text">
@@ -33,5 +33,6 @@
         </div>
     </div>
     <script src="/{{ asset_version_major }}/sha1.min.js?v={{ asset_version_minor }}" defer></script>
+    <script src="/{{ asset_version_major }}/crypto.js?v={{ asset_version_minor }}"></script>
     <script src="/{{ asset_version_major }}/index.js?v={{ asset_version_minor }}" defer></script>
 {% endblock %}

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Language\LanguageInterface;
+use App\Text\SolutionCheckerBuilder;
 use Exception;
 use HTMLPurifier;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -26,6 +27,7 @@ class IndexController extends AbstractController
         private readonly TranslatorInterface $translator,
         private readonly ServiceProviderInterface $languageProvider,
         private readonly RouterInterface $router,
+        private readonly SolutionCheckerBuilder $solutionCheckerBuilder,
         private readonly string $docsDirectory,
     ) {
     }
@@ -90,7 +92,7 @@ class IndexController extends AbstractController
     #[Route(path: '/{_locale}')]
     public function wikireveal(Request $request, string $assetVersion = 'assets'): Response
     {
-        $debug = false;
+        $debug = $request->query->getBoolean('debug', false);
         $lang = $request->getLocale();
         $dateInt = (int) (new \DateTimeImmutable())->format('Ymd');
         $puzzleId = $lang.'-'.$dateInt;
@@ -112,14 +114,7 @@ class IndexController extends AbstractController
         // To win the player has to find all the meaningful words of the subject,
         // so we are filtering the others.
         $subject = $this->decodeSubject($article);
-        $encodedSubject = $this->getEncoded($subject);
         $winTokens = $this->tokenize($subject);
-        // Remove one-letter and non-alphabetical tokens: https://regex101.com/r/jVVLjx/1
-        $winTokens = array_filter($winTokens, fn (string $e) => !preg_match('/^(.|[^a-z]+?)$/misu', $e));
-        $winTokens = array_filter($winTokens, fn (string $e) => false === $language->isPonctuation($e));
-        $winTokens = array_map($language->normalize(...), $winTokens);
-        $winTokens = array_map($this->getHash(...), $winTokens);
-        $winTokens = array_values($winTokens);
 
         $wikiHtml = $pageHtml['parse']['text'];
 
@@ -132,6 +127,7 @@ class IndexController extends AbstractController
         $tokens = $this->tokenize($pureHtml);
 
         $outputs = [];
+
         foreach ($tokens as $token) {
             if ($this->isHtmlMarkup($token)) {
                 $outputs[] = $token;
@@ -140,27 +136,26 @@ class IndexController extends AbstractController
             } else {
                 $normalized = $language->normalize($token);
                 $size = $this->getSize($token);
-                $encoded = $this->getEncoded($token);
                 $placeholder = $this->getPlaceholder($size);
-                /* @phpstan-ignore-next-line */
                 if ($debug) {
-                    $hashes = implode('|', $language->variations($normalized));
-                    $outputs[] = '<span data-hash="'.$hashes.'" class="wz-w-hide" data-size="'.$size.'" data-word="'.$encoded.'">'.$token.'</span>';
+                    $hash = $normalized;
+                    $outputs[] = '<span data-hash="'.$hash.'" class="wz-w-hide" data-size="'.$size.'">'.$token.'</span>';
                 } else {
-                    $hashes = implode('|', array_map($this->getHash(...), $language->variations($normalized)));
-                    $outputs[] = '<span data-hash="'.$hashes.'" class="wz-w-hide" data-size="'.$size.'" data-word="'.$encoded.'">'.$placeholder.'</span>';
+                    $hash = $this->getHash($token);
+                    $outputs[] = '<span data-hash="'.$hash.'" class="wz-w-hide" data-size="'.$size.'">'.$placeholder.'</span>';
                 }
             }
         }
+
+        $solutionChecker = $this->solutionCheckerBuilder->buildSolutionChecker($lang, $tokens, $winTokens);
 
         return $this->render('wikireveal.html.twig', [
             'asset_version_major' => $assetVersion,
             'lang' => $lang,
             'outputs' => $outputs,
             'puzzle_id' => $puzzleId,
-            'encoded_subject' => $encodedSubject,
             'common_words' => $language->commonWords(),
-            'win_hashes' => $winTokens,
+            'solution_checker' => $solutionChecker,
             'ui_messages' => [
                 'victory' => $this->translator->trans('message.victory'),
                 'already_sent' => $this->translator->trans('error.already_sent'),
@@ -189,11 +184,6 @@ class IndexController extends AbstractController
     private function getHash(string $normalized): string
     {
         return mb_substr(sha1($normalized), 0, 10);
-    }
-
-    private function getEncoded(string $word): string
-    {
-        return base64_encode(urlencode($word));
     }
 
     /**

@@ -7,11 +7,12 @@
   // From template
   const { uiMessages } = window;
   const { commonWords } = window;
-  const { winHashes } = window;
   const { puzzleId } = window;
+  const { solutionChecker } = window;
 
   // State
   const hashes = [];
+  const winFoundHashes = {};
   let currentHighlightedHash = '';
   let highlightedHashesIndex = 0;
   let wantFocusBack = null;
@@ -120,12 +121,12 @@
    * @param selector {string} The selector
    * @return {number} The number of words revealed
    */
-  const reveal = (selector) => {
+  const reveal = (selector, word) => {
     const wordElements = document.querySelectorAll(selector);
     wordElements.forEach((element) => {
       element.classList.remove('wz-w-hide');
       // eslint-disable-next-line no-param-reassign
-      element.innerHTML = decodeURIComponent(atob(element.dataset.word));
+      element.innerHTML = word;
     });
     return wordElements.length;
   };
@@ -134,16 +135,25 @@
    * Reveal all, used when the player wins
    * @return {number} The number of word revealed
    */
-  const revealAll = () => reveal('.wz-w-hide');
+  const revealAll = () => {
+    log(`Revealing all words ...`);
+
+    let rootPassword = '';
+    solutionChecker.winHashes.forEach((element) => {
+      rootPassword += winFoundHashes[element];
+    });
+
+    insertVariations(rootPassword, false);
+  };
 
   /**
    * Reveal words based on their hash
    * @param hash {string} The hash
    * @return {number} The number of word revealed
    */
-  const revealHash = (hash) => {
-    log(`Revealing hash ${hash}`);
-    return reveal(`[data-hash*="${hash}"]`);
+  const revealHash = (hash, word) => {
+    log(`Revealing hash ${hash}, word ${word}`);
+    return reveal(`[data-hash="${hash}"]`, word);
   };
 
   /**
@@ -158,13 +168,12 @@
     } else if (currentHighlightedHash === hash) {
       highlightedHashesIndex += 1;
     } else {
-      stopAllHighlights();
       currentHighlightedHash = hash;
       highlightedHashesIndex = 0;
     }
 
     let i = 0;
-    const words = document.querySelectorAll(`[data-hash*="${currentHighlightedHash}"]`);
+    const words = document.querySelectorAll(`[data-hash="${currentHighlightedHash}"]`);
     highlightedHashesIndex %= words.length;
     words.forEach((element) => {
       element.classList.add('wz-highlight');
@@ -214,14 +223,14 @@
    * @return {string} The hash
    */
   const insertWord = (word) => {
-    const normalized = normalize(word);
-    const hash = sha1(normalized).substring(0, 10);
-
+    const hash = sha1(word).substring(0, 10);
     hashes.push(hash);
 
-    const winHashIndex = winHashes.indexOf(hash);
-    if (winHashIndex !== -1) {
-      winHashes.splice(winHashIndex, 1);
+    const normalized = normalize(word);
+    const normalizedHash = sha1(normalized).substring(0, 10);
+
+    if (solutionChecker.winHashes.includes(normalizedHash)) {
+      winFoundHashes[normalizedHash] = normalized;
     }
 
     return hash;
@@ -233,6 +242,9 @@
    */
   const sendWord = (word) => {
     log(`Sent word "${word}" ...`);
+
+    saveWord(word);
+
     stopAllHighlights();
 
     if (word.length === 0) {
@@ -251,19 +263,66 @@
     insertWord(word);
 
     // Win condition
-    if (winHashes.length === 0) {
+    if (solutionChecker.winHashes.length === Object.keys(winFoundHashes).length) {
       showMessageToUser(uiMessages.victory, true);
       revealAll();
+
+      highlight(hash);
+
+      return;
     }
 
     highlight(hash);
 
-    const count = revealHash(hash);
+    let count = revealHash(hash, word);
+
+    count += insertVariations(word);
+
     addToList(hash, hashes.length - commonWords.length, word, count);
-    saveWord(word);
 
     guessInput.value = '';
   };
+
+  const insertVariations = (word, shouldHighlight = true) => {
+    const normalized = normalize(word);
+    const hash = sha1(normalized).substring(0, 10);
+
+    let count = 0;
+
+    if (solutionChecker.variationsMap[hash] !== undefined) {
+      const variationsEncrypted = solutionChecker.variationsMap[hash];
+      const salt = variationsEncrypted.substring(0, 12);
+      const iv = variationsEncrypted.substring(12, 24 + 12);
+      const ciphertext = variationsEncrypted.substring(24 + 12);
+
+      const cipherParams = CryptoJS.lib.CipherParams.create({
+        salt: CryptoJS.enc.Base64.parse(salt),
+        iv: CryptoJS.enc.Base64.parse(iv),
+        ciphertext: CryptoJS.enc.Base64.parse(ciphertext),
+      })
+      const variationsAsJson = CryptoJS.AES
+        .decrypt(cipherParams, normalized)
+        .toString(CryptoJS.enc.Utf8)
+      ;
+      const variations = JSON.parse(variationsAsJson);
+
+      variations.forEach((variation) => {
+        log(`Add variation "${variation}" ...`);
+
+        const variationHash = sha1(variation).substring(0, 10);
+
+        count += revealHash(variationHash, variation);
+
+        if (shouldHighlight) {
+          // highlight(variationHash);
+        }
+      });
+    } else {
+      log(`No variations found for "${word}"`);
+    }
+
+    return count;
+  }
 
   /**
    * Reveal the given common word
@@ -272,7 +331,9 @@
   const insertCommonWord = (word) => {
     log(`Add "${word}" to common words`);
     const hash = insertWord(word);
-    revealHash(hash);
+    revealHash(hash, word);
+
+    insertVariations(word, false);
   };
 
   /**
@@ -284,12 +345,12 @@
     const hash = insertWord(word);
 
     // Win condition
-    if (winHashes.length === 0) {
+    if (solutionChecker.winHashes.length === Object.keys(winFoundHashes).length) {
       showMessageToUser(uiMessages.victory, true);
       revealAll();
     }
 
-    const count = revealHash(hash);
+    const count = revealHash(hash, word);
     addToList(hash, hashes.length - commonWords.length, word, count);
   };
 
