@@ -2,7 +2,7 @@
 
 A multilingual version of redactle.com published at [wikireveal.com](https://wikireveal.com)
 
-> Redactle is a daily browser game where the user tries to determine the subject of a random obfuscated article chosen from Wikipedia's 10,000 Vital Articles (Level 4).
+> Redactle is a daily browser game where the user tries to determine the subject of a random obfuscated Wikipedia article chosen from Wikipedia's 10,000 Vital Articles (Level 4).
 
 This version is focused on user contributions & open source with a focus on implementing multiples languages by letting anyone contribute easily.
 
@@ -52,3 +52,7 @@ There is no framework on the CSS/Javascript side, so it is easy for anyone to pi
 
 The coding style is enforced by PHPCS and ESLint, you can simply launch those command before sending your PR:
 `wikireveal composer phpcs-fix` and `wikireveal composer eslint-fix`
+
+# Donate to Wikipedia
+
+Please consider a donation to [Wikipedia](https://donate.wikimedia.org/wiki/Special:FundraiserRedirector?utm_source=donate&utm_medium=sidebar&utm_campaign=C13_en.wikipedia.org&uselang=en)

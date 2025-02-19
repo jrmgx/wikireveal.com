@@ -2,13 +2,13 @@
 # https://www.reddit.com/r/Redactle/comments/wg2yma/comment/iixykiv/
 
 header:
-    title: "WikiReveal: encuentra el artículo detrás de las palabras censuradas."
-    description: "WikiReveal es un juego diario de navegador en el que el jugador tiene que descubrir el tema de un artículo aleatorio cuyas palabras han sido censuradas. Cada día se publica un puzzle nuevo a las 3 de la mañana (UTC, hora universal)."
+    title: "WikiReveal: encuentra el artículo de la Wikipedia detrás de las palabras censuradas."
+    description: "WikiReveal es un juego diario de navegador en el que el jugador tiene que descubrir el tema de un artículo aleatorio de la Wikipedia cuyas palabras han sido censuradas. Cada día se publica un puzzle nuevo a las 3 de la mañana (UTC, hora universal)."
 
 main:
     title: WikiReveal
-    sub_title: Encuentra el artículo detrás de las palabras censuradas.
-    description: "WikiReveal es un juego diario de navegador en el que el jugador tiene que descubrir el tema de un artículo aleatorio cuyas palabras han sido censuradas."
+    sub_title: Encuentra el artículo de la Wikipedia detrás de las palabras censuradas.
+    description: "WikiReveal es un juego diario de navegador en el que el jugador tiene que descubrir el tema de un artículo aleatorio de la Wikipedia cuyas palabras han sido censuradas."
     frequency: "Cada día se publica un puzzle nuevo a las 3 de la mañana (UTC, hora universal)."
 
 archives:

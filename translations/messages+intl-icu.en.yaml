@@ -1,11 +1,11 @@
 header:
-    title: "WikiReveal: Find the Page Behind the Redacted Words"
-    description: "WikiReveal is a daily browser game where the player have to determine the subject of a random obfuscated article. A new puzzle will be available every day at 3:00 AM UTC."
+    title: "WikiReveal: Find the Wikipedia Page Behind the Redacted Words"
+    description: "WikiReveal is a daily browser game where the player have to determine the subject of a random obfuscated Wikipedia article. A new puzzle will be available every day at 3:00 AM UTC."
 
 main:
     title: WikiReveal
-    sub_title: Find the Page Behind the Redacted Words
-    description: "WikiReveal is a daily browser game where the player have to determine the subject of a random obfuscated article."
+    sub_title: Find the Wikipedia Page Behind the Redacted Words
+    description: "WikiReveal is a daily browser game where the player have to determine the subject of a random obfuscated Wikipedia article."
     frequency: "A new puzzle will be available every day at 3:00 AM UTC."
 
 archives:
