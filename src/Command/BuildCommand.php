@@ -48,6 +48,8 @@ class BuildCommand extends Command
             return Command::FAILURE;
         }
 
+        $this->removePuzzlesOlderThanThreeMonths($io, $filesystem);
+
         // Assets
         $assets = (new Finder())->in($this->assetsDirectorySource);
         $assetDirectoryDestination = $this->docsDirectoryDestination.'/'.$this->assetVersion;
@@ -130,5 +132,53 @@ class BuildCommand extends Command
         }
 
         return $returnCode;
+    }
+
+    /**
+     * Deletes per-day puzzle folders under docs/{locale}/{Ymd}/ older than three months.
+     */
+    private function removePuzzlesOlderThanThreeMonths(SymfonyStyle $io, Filesystem $filesystem): void
+    {
+        $cutoff = (new \DateTimeImmutable('today'))->modify('-3 months');
+
+        foreach ($this->languageProvider->getProvidedServices() as $lang => $class) {
+            $langDir = $this->docsDirectoryDestination.'/'.$lang;
+            if (!$filesystem->exists($langDir)) {
+                continue;
+            }
+
+            $entries = scandir($langDir);
+            if (false === $entries) {
+                continue;
+            }
+
+            $removed = 0;
+            foreach ($entries as $name) {
+                if ('.' === $name || '..' === $name) {
+                    continue;
+                }
+
+                if (!preg_match('/^\d{8}$/', $name)) {
+                    continue;
+                }
+
+                $path = $langDir.'/'.$name;
+                if (!is_dir($path)) {
+                    continue;
+                }
+
+                $puzzleDay = \DateTimeImmutable::createFromFormat('!Ymd', $name);
+                if (false === $puzzleDay || $puzzleDay >= $cutoff) {
+                    continue;
+                }
+
+                $filesystem->remove($path);
+                ++$removed;
+            }
+
+            if ($removed > 0) {
+                $io->info(sprintf('Removed %d puzzle folder(s) older than 3 months for %s.', $removed, $lang));
+            }
+        }
     }
 }
