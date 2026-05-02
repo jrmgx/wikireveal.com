@@ -124,6 +124,20 @@ class BuildCommand extends Command
                     $this->docsDirectoryDestination.'/'.$lang.'/archive/index.html',
                     $response->getContent()
                 );
+
+                $io->info('Generating json archive for '.$lang.' ...');
+
+                $response = $this->indexController->archive($request, $this->assetVersion, '.json');
+                if (200 !== $response->getStatusCode()) {
+                    $io->error('Something went wrong.');
+
+                    $returnCode = Command::FAILURE;
+                }
+
+                file_put_contents(
+                    $this->docsDirectoryDestination.'/'.$lang.'/archive/index.json',
+                    $response->getContent()
+                );
             } catch (\Exception $e) {
                 $io->error($e->getMessage());
 

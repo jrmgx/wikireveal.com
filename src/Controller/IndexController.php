@@ -8,6 +8,7 @@ use HTMLPurifier;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -46,10 +47,11 @@ class IndexController extends AbstractController
         ]);
     }
 
-    #[Route('/{_locale}/archive')]
-    public function archive(Request $request, string $assetVersion = 'assets'): Response
+    #[Route('/{_locale}/archive{format}', requirements: ['format' => '^(|.json)$'], defaults: ['format' => ''])]
+    public function archive(Request $request, string $assetVersion = 'assets', string $format = ''): Response
     {
         $archives = [];
+        $json = '.json' === $format;
         $lang = $request->getLocale();
         $date = (new \DateTimeImmutable())->format('Ymd');
         $finder = (new Finder())->in($this->docsDirectory.'/'.$lang);
@@ -78,7 +80,12 @@ class IndexController extends AbstractController
                 'url' => $this->router->generate('app_index_wikireveal', ['_locale' => $lang]).'/'.$gameDate,
                 'subject' => $subject,
                 'date' => $dateTime,
+                'timestamp' => $dateTime->getTimestamp(),
             ];
+        }
+
+        if ($json) {
+            return new JsonResponse($archives);
         }
 
         return $this->render('archive.html.twig', [
@@ -311,7 +318,7 @@ class IndexController extends AbstractController
             'Block',  // content set
             'Flow', // allowed children
             'Common', // attribute collection
-            [] // attributes
+            // [] // attributes
         );
         $HTMLPurifier = new \HTMLPurifier($HTMLPurifierConfig);
 
