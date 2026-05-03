@@ -32,6 +32,22 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/{{ asset_version_major }}/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/{{ asset_version_major }}/favicon-16x16.png">
 
+    <style>
+        html, body {
+            font-family: sans-serif;
+            padding: 0;
+            margin: 0;
+            height: 100%;
+            color: #111;
+            background: white;
+        }
+        @media (prefers-color-scheme: dark) {
+            html, body {
+                color: white;
+                background: black;
+            }
+        }
+    </style>
 </head>
 <body>
 {% block body %}{% endblock %}

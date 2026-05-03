@@ -1,8 +1,12 @@
-(function main() {
+function main(
+    addToListHandler = null,
+    winMessageHandler = null,
+    alreadySentMessageHandler = null,
+) {
   // For debug
   // const log = (message) => console.log(message);
   // eslint-disable-next-line no-unused-vars
-  const log = (message) => {};
+  const log = (_message) => {};
 
   // From template
   const { uiMessages } = window;
@@ -16,6 +20,7 @@
   let highlightedHashesIndex = 0;
   let wantFocusBack = null;
   let autoscroll = true;
+  let letterCountsVisible = false;
 
   // DOM
   const uiPanelElement = document.querySelector('.wz-ui');
@@ -27,6 +32,12 @@
   const listTriesElement = document.getElementById('wz-list-tries');
   const messageSendElement = document.getElementById('wz-message-send');
   const textElement = document.querySelector('.wz-text');
+
+  const setAutoscroll = (enabled) => {
+    autoscroll = Boolean(enabled);
+    autoscrollCheckbox.checked = autoscroll;
+    localStorage.setItem('autoscroll', autoscroll.toString());
+  };
 
   /**
    * @param id {string} lang-YYYYMMDD
@@ -46,8 +57,9 @@
     });
   };
 
-  const shareWin = (e) => {
+  const shareWin = (_e) => {
     const navigatorShare = window.navigator;
+    // noinspection JSUnresolvedReference
     const title = uiMessages.share_public.replace('999', hashes.length - commonWords.length);
     log(title);
     const shareObject = { title, url: document.location };
@@ -56,34 +68,45 @@
         .then(() => { log('Share succeed!'); })
         .catch((error) => {
           // eslint-disable-next-line no-alert
+          // noinspection JSUnresolvedReference
           prompt(uiMessages.share_error, `${title} ${shareObject.url}`);
           log(error);
         });
     } else {
       // eslint-disable-next-line no-alert
+      // noinspection JSUnresolvedReference
       prompt(uiMessages.share_error, `${title} ${shareObject.url}`);
     }
-
-    e.preventDefault();
-    e.stopPropagation();
   };
 
-  /**
-   * Show a message in the UI
-   * @param message {string} The message to show
-   * @param won {boolean} Show sharing button
-   */
-  const showMessageToUser = (message, won) => {
-    messageSendElement.innerHTML = message;
-    if (won) {
-      messageSendElement.innerHTML = `<span>${message}</span><br><a href="#" class="wz-share">${uiMessages.share}</a>`;
-      messageSendElement.addEventListener('click', shareWin);
-    } else {
-      setTimeout(() => {
-        messageSendElement.classList.remove('wz-show');
-        messageSendElement.innerHTML = '';
-      }, 2500);
+  const showWinMessage = () => {
+    if (winMessageHandler) {
+      winMessageHandler();
+      return;
     }
+
+    // noinspection JSUnresolvedReference
+    messageSendElement.innerHTML = `<span>${uiMessages.victory}</span><br><a href="#" class="wz-share">${uiMessages.share}</a>`;
+    messageSendElement.addEventListener('click', (e) => {
+      shareWin(e);
+      e.preventDefault();
+      e.stopPropagation();
+    });
+    messageSendElement.classList.add('wz-show');
+  };
+
+  const showAlreadySentMessage = () => {
+    if (alreadySentMessageHandler) {
+      alreadySentMessageHandler();
+      return;
+    }
+
+    // noinspection JSUnresolvedReference
+    messageSendElement.innerHTML = uiMessages.already_sent;
+    setTimeout(() => {
+      messageSendElement.classList.remove('wz-show');
+      messageSendElement.innerHTML = '';
+    }, 2500);
     messageSendElement.classList.add('wz-show');
   };
 
@@ -101,6 +124,9 @@
     );
     // Scroll list to top
     uiPanelElement.scrollTop = 0;
+    if (addToListHandler) {
+      addToListHandler(hash, tries, word, count);
+    }
   };
 
   /**
@@ -123,6 +149,7 @@
   const reveal = (selector) => {
     const wordElements = document.querySelectorAll(selector);
     wordElements.forEach((element) => {
+      delete element.dataset.wzCountBackup;
       element.classList.remove('wz-w-hide');
       // eslint-disable-next-line no-param-reassign
       element.innerHTML = decodeURIComponent(atob(element.dataset.word));
@@ -151,7 +178,7 @@
    * @param hash {string} The hash
    * @param forceScroll {boolean} Force scroll to the first highlighted word
    */
-  const highlight = (hash, forceScroll) => {
+  const highlight = (hash, forceScroll= false) => {
     if (currentHighlightedHash.length === 0) {
       currentHighlightedHash = hash;
       highlightedHashesIndex = 0;
@@ -215,6 +242,7 @@
    */
   const insertWord = (word) => {
     const normalized = normalize(word);
+    // noinspection JSUnresolvedReference
     const hash = sha1(normalized).substring(0, 10);
 
     hashes.push(hash);
@@ -230,29 +258,31 @@
   /**
    * Action when the player enter a new guess
    * @param word {string} The word
+   * @return null when already sent (or if the word is empty)
    */
   const sendWord = (word) => {
     log(`Sent word "${word}" ...`);
     stopAllHighlights();
 
     if (word.length === 0) {
-      return;
+      return null;
     }
 
     const normalized = normalize(word);
+    // noinspection JSUnresolvedReference
     const hash = sha1(normalized).substring(0, 10);
 
     if (hashes.indexOf(hash) !== -1) {
-      showMessageToUser(uiMessages.already_sent, false);
+      showAlreadySentMessage()
       guessInput.value = '';
-      return;
+      return null;
     }
 
     insertWord(word);
 
     // Win condition
     if (winHashes.length === 0) {
-      showMessageToUser(uiMessages.victory, true);
+      showWinMessage()
       revealAll();
     }
 
@@ -263,6 +293,8 @@
     saveWord(word);
 
     guessInput.value = '';
+
+    return hash;
   };
 
   /**
@@ -285,12 +317,40 @@
 
     // Win condition
     if (winHashes.length === 0) {
-      showMessageToUser(uiMessages.victory, true);
+      showWinMessage();
       revealAll();
     }
 
     const count = revealHash(hash);
     addToList(hash, hashes.length - commonWords.length, word, count);
+  };
+
+  const applyLetterCountsVisibility = () => {
+    document.querySelectorAll('.wz-words span.wz-w-hide').forEach((span) => {
+      const size = Number(span.dataset.size);
+      if (Number.isNaN(size) || size <= 3) {
+        return;
+      }
+      if (letterCountsVisible) {
+        if (span.dataset.wzCountBackup === undefined) {
+          span.dataset.wzCountBackup = span.innerHTML;
+        }
+        const digits = String(size);
+        const pad = Math.max(0, size - digits.length);
+        span.innerHTML = `${'&nbsp;'.repeat(pad)}${digits}`;
+      } else if (span.dataset.wzCountBackup !== undefined) {
+        span.innerHTML = span.dataset.wzCountBackup;
+        delete span.dataset.wzCountBackup;
+      }
+    });
+  };
+
+  /**
+   * @param show {boolean} Whether letter counts are shown on hidden words (length > 3 only)
+   */
+  const setShowLetterCounts = (show) => {
+    letterCountsVisible = Boolean(show);
+    applyLetterCountsVisibility();
   };
 
   on(listTriesElement, 'click', 'div', (e) => {
@@ -303,16 +363,7 @@
 
   on(document.querySelector('.wz-words'), 'click', 'span.wz-w-hide', (e) => {
     e.preventDefault();
-    const span = e.target;
-    const { size } = span.dataset;
-    const prev = span.innerHTML;
-    if (size < 3) {
-      span.innerHTML = '&nbsp;'.repeat(size - 1) + size;
-    } else {
-      span.innerHTML = `${'&nbsp;'.repeat(size - 3)}(${size})`;
-    }
-    // back to initial state
-    setTimeout(() => { span.innerHTML = prev; }, 1500);
+    setShowLetterCounts(!letterCountsVisible);
   });
 
   /**
@@ -320,6 +371,7 @@
    * @param event {event} The event
    */
   const evenListener = (event) => {
+    // noinspection JSUnresolvedReference
     event.preventDefault();
     sendWord(guessInput.value.trim());
   };
@@ -329,19 +381,24 @@
     stopAllHighlights();
   });
 
+  const scrollToTop = () => {
+    document.querySelector('.wz-text').scrollTo({
+      top: 0, left: 0, behavior: 'smooth',
+    });
+  }
+
   sendAction.addEventListener('click', evenListener);
   sendForm.addEventListener('submit', evenListener);
   autoscrollCheckbox.addEventListener('change', (e) => {
     log(`Autoscroll is now ${e.target.checked}`);
-    autoscroll = e.target.checked;
-    localStorage.setItem('autoscroll', autoscroll.toString());
+    setAutoscroll(e.target.checked);
   });
-  scrollTopAction.addEventListener('click', (e) => {
-    e.preventDefault();
-    document.querySelector('.wz-text').scrollTo({
-      top: 0, left: 0, behavior: 'smooth',
+  if (scrollTopAction) {
+    scrollTopAction.addEventListener('click', (e) => {
+      e.preventDefault();
+      scrollToTop();
     });
-  });
+  }
 
   // Load the game
   log(`Loading game for puzzle id "${puzzleId}" ...`);
@@ -351,8 +408,7 @@
   const autoscrollLocalStorage = localStorage.getItem('autoscroll');
   if (autoscrollLocalStorage !== null) {
     log(`Restoring previous autoscroll state: "${autoscrollLocalStorage}"`);
-    autoscroll = autoscrollLocalStorage === true.toString();
-    autoscrollCheckbox.checked = autoscroll;
+    setAutoscroll(autoscrollLocalStorage === true.toString());
   }
 
   // Reload data
@@ -386,4 +442,15 @@
     });
     guessInput.focus();
   }
-}());
+
+  window.wzGame = {
+    highlight,
+    scrollToTop,
+    sendWord,
+    setAutoscroll,
+    setShowLetterCounts,
+  };
+}
+if (document.location.hash !== '#mobile') {
+  main();
+}

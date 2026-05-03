@@ -100,6 +100,7 @@ a.wz-share, a.wz-share:hover {
 
 .wz-w-hide {
     background: #DFDFDF;
+    color: #999;
 }
 
 .wz-highlight {
@@ -281,6 +282,7 @@ form #wz-action-send {
 
     .wz-w-hide {
         background: #2F2F2F;
+        color: #777;
     }
 
     .wz-ui, form {
