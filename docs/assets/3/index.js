@@ -45,6 +45,48 @@ function main(
    */
   const parsePuzzleIdDate = (id) => id.split('-')[1];
 
+  const PUZZLE_STORAGE_RETENTION_DAYS = 94;
+  const PUZZLE_STORAGE_KEY_RE = /^[a-z]{2}-\d{8}$/;
+
+  const utcYmdFromDate = (d) => (
+    d.getUTCFullYear() * 10000 + (d.getUTCMonth() + 1) * 100 + d.getUTCDate()
+  );
+
+  const utcTodayYmd = () => utcYmdFromDate(new Date());
+
+  const addDaysToUtcYmd = (ymd, deltaDays) => {
+    const y = Math.floor(ymd / 10000);
+    const m = Math.floor((ymd % 10000) / 100) - 1;
+    const day = ymd % 100;
+    const d = new Date(Date.UTC(y, m, day));
+    d.setUTCDate(d.getUTCDate() + deltaDays);
+    return utcYmdFromDate(d);
+  };
+
+  /**
+   * Drop puzzle saves older than PUZZLE_STORAGE_RETENTION_DAYS (calendar days, UTC, today inclusive).
+   * Other keys (e.g. autoscroll) are left untouched.
+   */
+  const pruneStalePuzzleStorage = () => {
+    const cutoffYmd = addDaysToUtcYmd(
+      utcTodayYmd(),
+      -(PUZZLE_STORAGE_RETENTION_DAYS - 1),
+    );
+    const keys = [];
+    for (let i = 0; i < localStorage.length; i += 1) {
+      keys.push(localStorage.key(i));
+    }
+    keys.forEach((key) => {
+      if (!key || !PUZZLE_STORAGE_KEY_RE.test(key)) {
+        return;
+      }
+      const datePart = parseInt(parsePuzzleIdDate(key), 10);
+      if (Number.isNaN(datePart) || datePart < cutoffYmd) {
+        localStorage.removeItem(key);
+      }
+    });
+  };
+
   /**
    * Delegate event
    * @see from https://stackoverflow.com/a/56570910/696517
@@ -420,14 +462,8 @@ function main(
     savedState.forEach(insertReplayWord);
   }
 
-  log('Clearing previous game states');
-  const puzzleDate = new RegExp(parsePuzzleIdDate(puzzleId));
-  for (let i = 0; i < localStorage.length; i += 1) {
-    const key = localStorage.key(i);
-    if (!puzzleDate.test(key)) {
-      localStorage.removeItem(key);
-    }
-  }
+  log('Pruning stale puzzle storage');
+  pruneStalePuzzleStorage();
 
   // Handling focus
   if (!window.matchMedia('(max-width: 768px)').matches) {
@@ -452,5 +488,7 @@ function main(
   };
 }
 if (document.location.hash !== '#mobile') {
+  document.querySelector('.wz-top').style.display = 'block';
+  document.querySelector('.wz-ui').style.display = 'block';
   main();
 }
