@@ -10,6 +10,25 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>{{ 'header.title'|trans }}</title>
+    <style>
+        html, body {
+            font-family: sans-serif;
+            padding: 0;
+            margin: 0;
+            height: 100%;
+            color: #111;
+            background: white;
+        }
+        @media (prefers-color-scheme: dark) {
+            html, body {
+                color: white;
+                background: black;
+            }
+        }
+        .wz-ui { display: none; }
+        .wz-top { display: none; }
+    </style>
+    {% block style %}{% endblock %}
     <link rel="stylesheet" href="/{{ asset_version_major }}/index.css?v={{ asset_version_minor }}">
 
     <meta name="title" content="{{ 'header.title'|trans }}">
@@ -31,25 +50,6 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/{{ asset_version_major }}/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/{{ asset_version_major }}/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/{{ asset_version_major }}/favicon-16x16.png">
-
-    <style>
-        html, body {
-            font-family: sans-serif;
-            padding: 0;
-            margin: 0;
-            height: 100%;
-            color: #111;
-            background: white;
-        }
-        @media (prefers-color-scheme: dark) {
-            html, body {
-                color: white;
-                background: black;
-            }
-        }
-        .wz-ui { display: none; }
-        .wz-top { display: none; }
-    </style>
 </head>
 <body>
 {% block body %}{% endblock %}
