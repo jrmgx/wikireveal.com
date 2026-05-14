@@ -16,6 +16,7 @@ archives:
     click_to_see: Pincha aquí para mostrar el tema de ese día.
     subject: "Tema:"
     unknown: "Desconocido"
+    promo: "Consíguelo en la App Store"
 
 ui:
     note: ""

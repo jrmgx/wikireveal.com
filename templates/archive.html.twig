@@ -11,11 +11,18 @@
             {{ 'main.title'|trans }}
             <small>{{ 'main.sub_title'|trans }}</small>
         </h1>
+        <div style="font-weight: bold">
+            {{ 'main.description'|trans }}<br>
+            {{ 'main.frequency'|trans }}
+        </div>
+        <hr>
         <div>
-            <cite>
-                {{ 'main.description'|trans }}<br>
-                {{ 'main.frequency'|trans }}
-            </cite>
+            {{ 'archives.promo'|trans }}<br>
+            <a href="https://apps.apple.com/app/apple-store/id6766313023?pt=979843&ct=wikireveal.com&mt=8">
+                <img src="/{{ asset_version_major }}/appstore.svg" alt="App Store"
+                     style="width:200px;margin-top: 1rem;"
+                />
+            </a>
         </div>
         <div>
             <h2>{{ 'archives.title'|trans }}</h2>

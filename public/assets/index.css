@@ -38,6 +38,13 @@ input, button {
     border-radius: 5px;
 }
 
+hr {
+    border: 0;
+    border-bottom: solid 5px #888;
+    padding-top: 1rem;
+    margin-bottom: 1rem;
+}
+
 /* Index */
 /*noinspection CssOverwrittenProperties*/
 .wz-section {
@@ -364,4 +371,10 @@ form #wz-action-send {
 /* X-Large devices (large desktops, 1200px and up) */
 @media (min-width: 1200px) {
 
+}
+
+#wz-promo {
+    text-align: center;
+    line-height: 0rem;
+    padding: 2rem 0;
 }

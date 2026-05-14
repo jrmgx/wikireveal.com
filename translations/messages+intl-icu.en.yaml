@@ -13,6 +13,7 @@ archives:
     click_to_see: Click to reveal the subject of that day
     subject: "Subject:"
     unknown: "Unknown"
+    promo: "Get it on the App Store"
 
 ui:
     note: ""
