@@ -50,6 +50,8 @@ class BuildCommand extends Command
 
         $this->removePuzzlesOlderThanThreeMonths($io, $filesystem);
 
+        $returnCode = $this->backfillMissingPuzzles($io, $filesystem);
+
         // Assets
         $assets = (new Finder())->in($this->assetsDirectorySource);
         $assetDirectoryDestination = $this->docsDirectoryDestination.'/'.$this->assetVersion;
@@ -77,7 +79,6 @@ class BuildCommand extends Command
         );
 
         // The idea is to be over resilient but still crash the CI job so the maintainer can check the log
-        $returnCode = Command::SUCCESS;
         // Puzzle of the day + archive for each lang
         foreach ($this->languageProvider->getProvidedServices() as $lang => $class) {
             try {
@@ -142,6 +143,53 @@ class BuildCommand extends Command
                 $io->error($e->getMessage());
 
                 $returnCode = Command::FAILURE;
+            }
+        }
+
+        return $returnCode;
+    }
+
+    /**
+     * Generates docs/{locale}/{Ymd}/ for each missing day within the last three months (through yesterday).
+     */
+    private function backfillMissingPuzzles(SymfonyStyle $io, Filesystem $filesystem): int
+    {
+        $returnCode = Command::SUCCESS;
+        $today = new \DateTimeImmutable('today');
+        $cutoff = $today->modify('-3 months');
+        $yesterday = $today->modify('-1 day');
+
+        foreach ($this->languageProvider->getProvidedServices() as $lang => $class) {
+            $this->localeSwitcher->setLocale($lang);
+
+            $request = new Request();
+            $request->setLocale($lang);
+
+            for ($day = $cutoff; $day <= $yesterday; $day = $day->modify('+1 day')) {
+                $date = $day->format('Ymd');
+                $puzzleFile = $this->docsDirectoryDestination.'/'.$lang.'/'.$date.'/index.html';
+                if ($filesystem->exists($puzzleFile)) {
+                    continue;
+                }
+
+                $io->info(sprintf('Backfilling puzzle for %s on %s ...', $lang, $date));
+
+                try {
+                    $response = $this->indexController->wikireveal($request, $this->assetVersion, $day);
+                    if (200 !== $response->getStatusCode()) {
+                        $io->error('Something went wrong.');
+                        $returnCode = Command::FAILURE;
+
+                        continue;
+                    }
+
+                    $filesystem->mkdir($this->docsDirectoryDestination.'/'.$lang.'/'.$date);
+                    file_put_contents($puzzleFile, $response->getContent());
+                    usleep(500_000);
+                } catch (\Exception $e) {
+                    $io->error($e->getMessage());
+                    $returnCode = Command::FAILURE;
+                }
             }
         }
 

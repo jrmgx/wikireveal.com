@@ -95,11 +95,12 @@ class IndexController extends AbstractController
     }
 
     #[Route(path: '/{_locale}')]
-    public function wikireveal(Request $request, string $assetVersion = 'assets'): Response
+    public function wikireveal(Request $request, string $assetVersion = 'assets', ?\DateTimeImmutable $on = null): Response
     {
         $debug = false;
         $lang = $request->getLocale();
-        $dateInt = (int) (new \DateTimeImmutable())->format('Ymd');
+        $gameDay = $on ?? new \DateTimeImmutable();
+        $dateInt = (int) $gameDay->format('Ymd');
         $puzzleId = $lang.'-'.$dateInt;
 
         try {
@@ -212,14 +213,23 @@ class IndexController extends AbstractController
     private function getPageHtml(string $subject, string $lang): array
     {
         // https://en.wikipedia.org/w/api.php?action=parse&format=json&page=Pet_door&prop=text&formatversion=2
-        $response = $this->httpClient->request(
-            'GET',
-            "https://$lang.wikipedia.org/w/api.php".
-            "?action=parse&format=json&page=$subject&prop=text&formatversion=2&redirects"
-        );
-        $content = $response->getContent();
+        $url = "https://$lang.wikipedia.org/w/api.php".
+            "?action=parse&format=json&page=$subject&prop=text&formatversion=2&redirects";
 
-        return json_decode($content, true);
+        for ($attempt = 0; $attempt < 6; ++$attempt) {
+            $response = $this->httpClient->request('GET', $url);
+            if (429 === $response->getStatusCode()) {
+                sleep(min(30, 2 ** $attempt));
+
+                continue;
+            }
+
+            $content = $response->getContent();
+
+            return json_decode($content, true);
+        }
+
+        throw new \RuntimeException('Wikipedia API rate limit (429) after retries.');
     }
 
     /**
